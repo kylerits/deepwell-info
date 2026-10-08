@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import { COVER_SLUGS } from '../lib/cover/pool';
 import FieldStatic from '../components/FieldStatic.astro';
+import Field from '../components/Field.svelte';
 import Hero from '../components/sections/Hero.astro';
 import TrustStrip from '../components/sections/TrustStrip.astro';
 import Problem from '../components/sections/Problem.astro';
@@ -18,6 +19,7 @@ import Footer from '../components/sections/Footer.astro';
 <Base coverSlugs={COVER_SLUGS}>
   <main class="dw">
     <FieldStatic />
+    <Field client:idle />
     <Hero /><TrustStrip /><Problem /><Module01 /><Module02 /><Module03 /><Themes /><Pricing /><Licensing /><Faq /><FinalCta /><Footer />
     <div class="osd" aria-hidden="true">▶ SP <span data-osd-time>00:14:07</span>   TRACKING ──┼──</div>
   </main>

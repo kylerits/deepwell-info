@@ -47,7 +47,7 @@ export function wireHoldSources(gate: HoldGate, env: { doc: Document; nav: Navig
       b.addEventListener('levelchange', onSave);
       b.addEventListener('chargingchange', onSave);
       onSave();
-    });
+    }).catch(() => { /* battery API refused: no saver hold */ });
   }
 
   return () => {
