@@ -1,6 +1,7 @@
 ---
 import { LAUNCH_STATE } from '../../config/launch';
 import { APP_URL } from '../../config/site';
+import WaitlistForm from '../WaitlistForm.astro';
 import Logo from '../brand/Logo.astro';
 import PlainSummary from '../PlainSummary.astro';
 import CoverSlots from '../cover/CoverSlots.astro';
@@ -17,7 +18,7 @@ import CoverSlots from '../cover/CoverSlots.astro';
       <div data-launch-slot="hero">
         {LAUNCH_STATE === 'public'
           ? <div class="cta-row"><a class="btn" href={APP_URL}>Start reading — free</a></div>
-          : <div data-waitlist-placeholder></div>}
+          : <WaitlistForm id="hero" label="Get early access" />}
       </div>
       <p class="micro">Free to read, always. No ads. No account required.</p>
       <PlainSummary>Deepwell is a free, cozy, offline reader for the SCP Wiki. Every article, set like a book. Free forever.</PlainSummary>

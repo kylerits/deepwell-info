@@ -1,6 +1,7 @@
 ---
 import { LAUNCH_STATE } from '../../config/launch';
 import { APP_URL } from '../../config/site';
+import WaitlistForm from '../WaitlistForm.astro';
 ---
 <section class="sec sec--cta" id="start" aria-labelledby="cta-h" data-depth="0.96">
   <div class="tube tube--side" aria-hidden="true"></div>
@@ -11,7 +12,7 @@ import { APP_URL } from '../../config/site';
     <div data-launch-slot="final">
       {LAUNCH_STATE === 'public'
         ? <div class="cta-row"><a class="btn" href={APP_URL}>Start reading — free</a></div>
-        : <div data-waitlist-placeholder></div>}
+        : <WaitlistForm id="final" label="Join the waitlist" note="We’ll email you once. When it’s ready." />}
     </div>
   </div></div>
 </section>
