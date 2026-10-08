@@ -1,0 +1,16 @@
+---
+import Base from '../layouts/Base.astro';
+import Logo from './brand/Logo.astro';
+import FieldStatic from './FieldStatic.astro';
+interface Props { title: string; path: string }
+const { title, path } = Astro.props;
+---
+<Base title={title} path={path}>
+  <main class="dw">
+    <FieldStatic />
+    <section class="sec">
+      <header class="wrap top"><a class="top__logo" href="/" aria-label="Deepwell home"><Logo decorative /></a></header>
+      <div class="wrap"><div class="col"><slot /></div></div>
+    </section>
+  </main>
+</Base>
