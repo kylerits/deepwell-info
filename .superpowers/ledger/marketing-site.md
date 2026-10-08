@@ -12,3 +12,4 @@ Branch: feat/marketing-site
 | 5 | feat: scroll depth anchors and easing | depth (6) | pure; consumed by field island |
 | 6 | feat: Descent field parameters from the round-1 handoff | field-params (8) | handoff §4 numbers verbatim |
 | 7 | feat: idle-triggered presence state machine | presence (6) | once per session, idle 8s, depth > 0.6 |
+| 8 | feat: port cover art, class and title helpers from the app | cover ports (ported app tests unchanged) + classification (3) + ports drift (4) | unchanged ports drift-tested; classification/acs/series are subsets |
