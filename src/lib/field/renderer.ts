@@ -31,7 +31,7 @@ export function createFieldRenderer(canvas: HTMLCanvasElement): FieldRenderer | 
   const gl = canvas.getContext('webgl2', { alpha: false, antialias: false, depth: false, stencil: false, powerPreference: 'low-power' });
   if (!gl) return null;
   const field = program(gl, FULL_VERT, FRAG), motes = program(gl, MOTE_VERT, MOTE_FRAG);
-  if (!field || !motes) return null;
+  if (!field || !motes) { if (field) gl.deleteProgram(field); if (motes) gl.deleteProgram(motes); return null; }
 
   const emptyVao = gl.createVertexArray();
   const moteVao = gl.createVertexArray(), moteBuf = gl.createBuffer();
@@ -51,8 +51,11 @@ export function createFieldRenderer(canvas: HTMLCanvasElement): FieldRenderer | 
   return {
     resize(w, h, dpr) {
       cssW = Math.max(1, w); cssH = Math.max(1, h); scale = Math.min(dpr || 1, DPR_CAP) * RES_SCALE;
-      canvas.width = Math.max(1, Math.round(cssW * scale)); canvas.height = Math.max(1, Math.round(cssH * scale));
-      gl.viewport(0, 0, canvas.width, canvas.height);
+      const bw = Math.max(1, Math.round(cssW * scale)), bh = Math.max(1, Math.round(cssH * scale));
+      // Assigning width/height (even unchanged) clears the buffer to #000: only touch it on a real change.
+      if (bw === canvas.width && bh === canvas.height) return;
+      canvas.width = bw; canvas.height = bh;
+      gl.viewport(0, 0, bw, bh);
     },
     draw(f) {
       gl.disable(gl.BLEND);

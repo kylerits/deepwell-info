@@ -25,9 +25,20 @@ test('motes: full count at the hero, half at reduced, none deep; positions stati
   expect(at({ d: 0.7 }).moteCount).toBe(0);
   expect(Array.from(at({ motion: 'reduced', timeMs: 0 }).motes)).toEqual(Array.from(at({ motion: 'reduced', timeMs: 9999 }).motes));
 });
-test('motes never rise above their rest position (drift is down/right then back)', () => {
-  const rest = at({ timeMs: 0 }); const later = at({ timeMs: 4321 });
-  for (let i = 0; i < rest.moteCount; i++) expect(later.motes[i * 4 + 1]!).toBeGreaterThanOrEqual(rest.motes[i * 4 + 1]! - 1e-6 - 9);
+test('motes never rise above (or left of) their rest position: drift is down/right then back', () => {
+  // Reduced draws the even-indexed motes undrifted, so reduced mote k is full mote 2k at rest.
+  const rest = at({ motion: 'reduced' });
+  let moved = false;
+  for (let t = 0; t < 30000; t += 1234) {
+    const full = at({ timeMs: t });
+    for (let k = 0; k < rest.moteCount; k++) {
+      const j = 2 * k;
+      expect(full.motes[j * 4 + 1]!).toBeGreaterThanOrEqual(rest.motes[k * 4 + 1]! - 1e-6);
+      expect(full.motes[j * 4]!).toBeGreaterThanOrEqual(rest.motes[k * 4]! - 1e-6);
+      if (full.motes[j * 4 + 1]! > rest.motes[k * 4 + 1]! + 0.5) moved = true;
+    }
+  }
+  expect(moved).toBe(true); // the drift is real, so the bound is not vacuous
 });
 test('one shaft and no bloom by the final CTA; presence packs its envelope', () => {
   const f = at({ d: 0.96, presence: 0.5 });

@@ -9,7 +9,7 @@ test('WebGL field mounts at full, with no console errors', async ({ page }) => {
   expect(errors).toEqual([]);
 });
 test('no WebGL2 → static field, page intact, no errors (Review Focus 2)', async ({ page }) => {
-  const errors: string[] = []; page.on('pageerror', (e) => errors.push(e.message));
+  const errors: string[] = []; page.on('console', (m) => m.type() === 'error' && errors.push(m.text())); page.on('pageerror', (e) => errors.push(e.message));
   await page.addInitScript(() => { const g = HTMLCanvasElement.prototype.getContext; HTMLCanvasElement.prototype.getContext = function (this: HTMLCanvasElement, t: string, ...a: unknown[]) { return t === 'webgl2' ? null : (g as any).call(this, t, ...a); } as any; });
   await page.goto('/');
   await expect(page.locator('html')).toHaveAttribute('data-field', 'static');

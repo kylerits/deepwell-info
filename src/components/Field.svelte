@@ -26,6 +26,8 @@
     let osdText = osd?.textContent ?? '';
 
     const motion = (): 'full' | 'reduced' | 'off' => (level === 'off' ? 'off' : effectiveMotion(level, rm.matches));
+    /** Continuous animation only at full, with a live renderer, and while nothing holds the atmosphere. */
+    const live = (): boolean => motion() === 'full' && renderer !== null && !gate.isHeld();
     const gate = createHoldGate(root, (held) => { if (!held) schedule(); });
     const unwire = wireHoldSources(gate, { doc: document, nav: navigator });
 
@@ -47,6 +49,7 @@
       if (osd && t !== osdText) { osdText = t; osd.textContent = t; }
     }
     function stepP(now: number): void {
+      if (!renderer || gate.isHeld()) return; // nothing drawn, or held: never arm or run the presence
       const before = presence.phase;
       presence = stepPresence(presence, { now, d, motion: motion(), lastInputAt });
       if (before !== 'running' && presence.phase === 'running') markSeen();
@@ -55,21 +58,22 @@
     function frame(now: number): void {
       raf = 0;
       const m = motion();
+      const animate = live(); // held or rendererless full behaves like reduced: settled depth, frozen time
       const target = depthAt(scrollY, anchors);
-      d = m === 'full' ? approach(d, target, now - lastT) : target;
+      d = animate ? approach(d, target, now - lastT) : target;
       lastT = now;
       osdAt(d);
       stepP(now);
       if (renderer && m !== 'off') {
-        renderer.draw(buildFrame({ d, width: innerWidth, height: innerHeight, timeMs: m === 'full' ? now : 0, motion: m, presence: presenceProgress(presence, now) }));
+        renderer.draw(buildFrame({ d, width: innerWidth, height: innerHeight, timeMs: animate ? now : 0, motion: animate ? 'full' : 'reduced', presence: presenceProgress(presence, now) }));
       }
-      if (m === 'full' && !gate.isHeld()) schedule();
+      if (animate) schedule();
     }
     function schedule(): void { if (!raf) raf = requestAnimationFrame(frame); }
 
     const onInput = (): void => {
       lastInputAt = performance.now();
-      if (motion() === 'full') { schedule(); return; }
+      if (live()) { schedule(); return; }
       osdAt(depthAt(scrollY, anchors));
       clearTimeout(settle);
       settle = window.setTimeout(schedule, 150); // reduced: one still frame once scrolling settles
@@ -79,7 +83,8 @@
       if (isLevel(next)) level = next;
       ensureRenderer(); stepP(performance.now()); schedule();
     };
-    const onResize = (): void => { measure(); schedule(); };
+    // Redraw immediately (not on the next rAF) so a resized buffer never shows its cleared #000.
+    const onResize = (): void => { measure(); cancelAnimationFrame(raf); raf = 0; frame(performance.now()); };
     const onLost = (e: Event): void => { e.preventDefault(); renderer = null; setField(); };
     const onRestored = (): void => { ensureRenderer(); schedule(); };
 
