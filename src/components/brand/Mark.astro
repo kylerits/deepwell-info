@@ -1,8 +1,9 @@
 ---
-// VENDORED geometry from ~/projects/Deepwell/design/brand/logo/deepwell-mark.svg (2026-10-08). Never redraw.
+// VENDORED geometry from ~/projects/Deepwell/design/brand/logo/deepwell-mark.svg (2026-10-08). Never redraw. The tint is a prop (default is the light-theme ink; pass color for dark fields).
+const { color = '#161C21' } = Astro.props;
 ---
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" aria-hidden="true">
-  <g fill="none" stroke="currentColor" color="#161C21" stroke-width="7"
+  <g fill="none" stroke="currentColor" color={color} stroke-width="7"
      stroke-linecap="round" stroke-linejoin="round">
     <path d="M 37 28 A 37.5 15 0 1 0 63 28 A 2 2 0 0 0 63 32
              A 31 8.75 0 1 1 37 32 A 2 2 0 0 0 37 28 Z"

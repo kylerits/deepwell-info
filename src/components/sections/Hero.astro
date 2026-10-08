@@ -1,0 +1,27 @@
+---
+import { LAUNCH_STATE } from '../../config/launch';
+import { APP_URL } from '../../config/site';
+import Logo from '../brand/Logo.astro';
+import PlainSummary from '../PlainSummary.astro';
+import CoverSlots from '../cover/CoverSlots.astro';
+---
+<section class="sec sec--hero" id="top" aria-labelledby="hero-h1" data-depth="0">
+  <div class="tube tube--side" aria-hidden="true"></div>
+  <header class="wrap top"><a class="top__logo" href="#top" aria-label="Deepwell"><Logo decorative /></a></header>
+  <div class="wrap hero__grid hero__grid--cover">
+    <div class="col">
+      <p class="eyebrow">ORIENTATION PACKET · FIELD PERSONNEL, LEVEL 2</p>
+      <p class="subtitle">An unofficial reader for the SCP Wiki</p>
+      <h1 class="h1 h1--pair recede-h" id="hero-h1"><span class="h1__line">Welcome to orientation.</span> <span class="h1__line">Secure. Contain. Peruse.</span></h1>
+      <p class="narr recede">New field staff are expected to know the files before they meet them. Deepwell is how you study: every article in the archive, beautifully set, readable offline, with nothing between you and the record.</p>
+      <div data-launch-slot="hero">
+        {LAUNCH_STATE === 'public'
+          ? <div class="cta-row"><a class="btn" href={APP_URL}>Start reading — free</a></div>
+          : <div data-waitlist-placeholder></div>}
+      </div>
+      <p class="micro">Free to read, always. No ads. No account required.</p>
+      <PlainSummary>Deepwell is a free, cozy, offline reader for the SCP Wiki. Every article, set like a book. Free forever.</PlainSummary>
+    </div>
+    <div class="hero__visual hero__visual--cover"><CoverSlots /></div>
+  </div>
+</section>

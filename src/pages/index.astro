@@ -1,6 +1,15 @@
 ---
 import Base from '../layouts/Base.astro';
-import CoverSlots from '../components/cover/CoverSlots.astro';
 import { COVER_SLUGS } from '../lib/cover/pool';
+import Hero from '../components/sections/Hero.astro';
+import TrustStrip from '../components/sections/TrustStrip.astro';
+import Problem from '../components/sections/Problem.astro';
+import Module01 from '../components/sections/Module01.astro';
+import Module02 from '../components/sections/Module02.astro';
+import Module03 from '../components/sections/Module03.astro';
 ---
-<Base coverSlugs={COVER_SLUGS}><main class="dw"><CoverSlots /></main></Base>
+<Base coverSlugs={COVER_SLUGS}>
+  <main class="dw">
+    <Hero /><TrustStrip /><Problem /><Module01 /><Module02 /><Module03 />
+  </main>
+</Base>
