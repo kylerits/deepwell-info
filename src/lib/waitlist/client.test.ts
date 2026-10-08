@@ -6,7 +6,7 @@ import { WAITLIST_CONFIRMATION, WAITLIST_ERROR } from './copy';
 function mount() {
   document.body.innerHTML = `<div data-waitlist-root>
     <form data-waitlist action="/api/waitlist" method="post"><input name="email" type="email" value="a@b.co"><input name="company" value=""><button type="submit">Get early access</button></form>
-    <p class="micro" data-waitlist-note>We’ll email you once.</p><p role="status" data-waitlist-status></p></div>`;
+    <p class="micro" data-waitlist-note>We’ll email you once.</p><p role="status" tabindex="-1" data-waitlist-status></p></div>`;
   return document.querySelector('form')!;
 }
 beforeEach(() => vi.restoreAllMocks());
@@ -20,6 +20,7 @@ test('success: posts JSON-accepting, hides form and note, announces the confirma
   expect(form.hidden).toBe(true);
   expect((document.querySelector('[data-waitlist-note]') as HTMLElement).hidden).toBe(true);
   expect(document.querySelector('[data-waitlist-status]')!.textContent).toBe(WAITLIST_CONFIRMATION);
+  expect(document.activeElement).toBe(document.querySelector('[data-waitlist-status]'));
 });
 test('network failure or 429: plain error, button re-enabled, form kept (Review Focus 3)', async () => {
   for (const f of [vi.fn(async () => { throw new TypeError('offline'); }), vi.fn(async () => new Response('{}', { status: 429 }))]) {
@@ -28,6 +29,7 @@ test('network failure or 429: plain error, button re-enabled, form kept (Review 
     expect(form.hidden).toBe(false);
     expect(form.querySelector('button')!.disabled).toBe(false);
     expect(document.querySelector('[data-waitlist-status]')!.textContent).toBe(WAITLIST_ERROR);
+    expect(document.activeElement).toBe(form.querySelector('button'));
   }
 });
 test('double submit while in flight sends one request', async () => {

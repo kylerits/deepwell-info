@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { Window } from 'happy-dom';
 import { expect, test } from 'vitest';
 
@@ -14,4 +14,10 @@ test('pilot: hero and final forms post to the Worker without JS, with labelled e
   }
   expect(forms.map((f) => f.querySelector('button')!.textContent)).toEqual(['Get early access', 'Join the waitlist']);
   expect(d.body.textContent).toContain('We’ll email you once. When it’s ready.');
+});
+
+test('built CSS hides [hidden] elements despite author display rules', () => {
+  const css = readdirSync('dist-pilot/_astro').filter((n) => n.endsWith('.css')).map((n) => readFileSync(`dist-pilot/_astro/${n}`, 'utf8')).join('\n')
+    + [...readFileSync('dist-pilot/index.html', 'utf8').matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map((m) => m[1]).join('\n');
+  expect(css).toMatch(/\[hidden\]\s*\{[^}]*display:\s*none\s*!important/);
 });

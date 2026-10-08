@@ -17,11 +17,11 @@ export async function submitWaitlist(form: HTMLFormElement, fetchImpl: typeof fe
     form.hidden = true;
     const note = root.querySelector<HTMLElement>('[data-waitlist-note]');
     if (note) note.hidden = true;
-    if (status) status.textContent = WAITLIST_CONFIRMATION;
+    if (status) { status.textContent = WAITLIST_CONFIRMATION; status.focus(); }
     return 'ok';
   } catch {
     if (status) status.textContent = WAITLIST_ERROR;
-    if (button) button.disabled = false;
+    if (button) { button.disabled = false; button.focus(); }
     return 'error';
   } finally {
     inflight.delete(form);

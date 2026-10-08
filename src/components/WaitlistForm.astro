@@ -12,7 +12,7 @@ const { id, label, note } = Astro.props;
     <button class="btn" type="submit">{label}</button>
   </form>
   {note && <p class="micro" data-waitlist-note>{note}</p>}
-  <p class="noted" role="status" data-waitlist-status></p>
+  <p class="noted" role="status" tabindex="-1" data-waitlist-status></p>
 </div>
 <script>
   import { wireWaitlistForms } from '../lib/waitlist/client';
