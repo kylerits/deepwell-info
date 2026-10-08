@@ -1,13 +1,6 @@
 /* VENDORED from ~/projects/Deepwell/design/marketing_site/handoff/reference/landing.css
-   (lines 222-224 focus ring, 239-254 .reader/.reader__lamp/.reader__edge, 284-383 cover and class panel),
-   with the Task 11 edits noted inline. */
-
-/* TEMPORARY: replaced by site.css in Task 12. Delete this block then. */
-:root { --ink: #EADFC6; --ink-soft: #A2977E; --line: #2E2637; --teal: #5FA79F; --f-type: "Courier Prime", monospace; --f-ui: "Inter", sans-serif; --ease: cubic-bezier(0.2,0,0,1); }
-
-.cover__read:focus-visible, .cover__attr a:focus-visible {
-  outline: 2px solid var(--teal); outline-offset: 3px;
-}
+   (lines 239-254 .reader/.reader__lamp/.reader__edge, 284-383 cover and class panel),
+   with the Task 11 edits noted inline. The focus ring lives once, in site.css. */
 
 /* The product: the one warm thing on screen. Edge-lit by lamp amber, never boxed or shadowed. */
 .reader {
