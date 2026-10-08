@@ -1,4 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import CoverSlots from '../components/cover/CoverSlots.astro';
+import { COVER_SLUGS } from '../lib/cover/pool';
 ---
-<Base><main class="dw"></main></Base>
+<Base coverSlugs={COVER_SLUGS}><main class="dw"><CoverSlots /></main></Base>
