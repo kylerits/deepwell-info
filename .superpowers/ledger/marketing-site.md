@@ -11,3 +11,4 @@ Branch: feat/marketing-site
 | 4 | feat: atmosphere hold gate (ported visibility + battery hold) | hold (4) | ported hold/release + visibility/battery sources |
 | 5 | feat: scroll depth anchors and easing | depth (6) | pure; consumed by field island |
 | 6 | feat: Descent field parameters from the round-1 handoff | field-params (8) | handoff §4 numbers verbatim |
+| 7 | feat: idle-triggered presence state machine | presence (6) | once per session, idle 8s, depth > 0.6 |
