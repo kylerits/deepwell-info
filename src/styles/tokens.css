@@ -1,0 +1,88 @@
+/* VENDORED from ~/projects/Deepwell/design/brand/tokens.css on 2026-10-08. Source of truth is the design repo; re-vendor, don't edit. */
+/* Deepwell — Design Tokens v3.0 "Microfilm / Black Lodge"
+   A terminal into the archive: backlit microfilm reader in a dark records room.
+   Light = pale cool blue-gray microfilm screen.
+   Dark  = the Black Lodge: blue-black, curtain red, dreamy teal (unchanged from v2). */
+
+:root {
+  /* ---- Color: Light — "Microfilm" (default) ---- */
+  --color-paper: #E4E9ED;        /* microfilm screen, pale blue-gray */
+  --color-paper-raised: #EFF3F6; /* backlit frame */
+  --color-ink: #161C21;          /* cool near-black */
+  --color-ink-soft: #4E5A63;     /* secondary text, captions */
+  --color-line: #C4CDD4;         /* hairlines, dividers */
+  --color-accent: #A8332F;       /* stamp red — links, actives, alerts */
+  --color-accent-ink: #7E211E;   /* stamp red pressed/hover */
+  --color-accent-2: #2F6B66;     /* dreamy teal, deepened for cool paper */
+  --color-lamp: #C98A3B;         /* lamp amber — the only warm note */
+  --color-redact: #10151A;       /* redaction bars, brand mark */
+
+  /* Object-class chips */
+  --color-class-safe: #4C7D6B;
+  --color-class-euclid: #B8862E;
+  --color-class-keter: #A8332F;
+
+  /* ---- Typography ---- */
+  --font-reading: "Literata", "Georgia", serif;
+  --font-ui: "Inter", -apple-system, "Segoe UI", sans-serif;
+  --font-typewriter: "Courier Prime", "Courier New", monospace; /* item numbers, labels, stamps */
+
+  /* BR-08a reader body-font choices (all OFL). Default is --font-reading; readers may
+     switch to either accessibility face and the choice persists like any preference. */
+  --font-reading-legible: "Atkinson Hyperlegible", var(--font-ui); /* high-legibility sans */
+  --font-reading-dyslexic: "OpenDyslexic", "Comic Sans MS", var(--font-reading); /* dyslexia-friendly */
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;   /* default reading size */
+  --text-xl: 1.375rem;
+  --text-2xl: 1.75rem;
+  --text-3xl: 2.25rem;
+
+  --leading-reading: 1.7;
+  --leading-ui: 1.4;
+  --measure-reading: 68ch;
+
+  /* ---- Spacing (4px scale) ---- */
+  --space-1: 4px;  --space-2: 8px;  --space-3: 12px; --space-4: 16px;
+  --space-5: 24px; --space-6: 32px; --space-7: 48px; --space-8: 64px;
+
+  /* ---- Shape & elevation ---- */
+  --radius-sm: 4px;   /* squarer than v1 — filing-cabinet, not bubble */
+  --radius-md: 8px;
+  --radius-lg: 14px;
+  --shadow-card: 0 1px 3px rgba(26, 23, 18, 0.10);
+  --shadow-sheet: 0 8px 32px rgba(26, 23, 18, 0.20);
+
+  /* ---- Motion ---- */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-page: 320ms;
+}
+
+/* ---- Color: Dark — "Black Lodge" ---- */
+[data-theme="dark"] {
+  --color-paper: #131019;        /* blue-black */
+  --color-paper-raised: #1C1724; /* raised violet-black */
+  --color-ink: #EADFC6;          /* aged paper text */
+  --color-ink-soft: #A2977E;
+  --color-line: #2E2637;
+  --color-accent: #C24B54;       /* curtain red, lifted for contrast */
+  --color-accent-ink: #E0757C;
+  --color-accent-2: #5FA79F;     /* dreamy teal glow */
+  --color-lamp: #D9973F;
+  --color-redact: #EADFC6;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-sheet: 0 8px 32px rgba(0, 0, 0, 0.65);
+}
+
+/* ---- Color: Sepia — "Cold Case" (optional third theme) ---- */
+[data-theme="sepia"] {
+  --color-paper: #E9DCBE;
+  --color-paper-raised: #F2E8CF;
+  --color-ink: #3A3122;
+  --color-ink-soft: #6E6248;
+  --color-line: #D3C29A;
+}
