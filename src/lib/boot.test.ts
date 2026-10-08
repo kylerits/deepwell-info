@@ -32,3 +32,10 @@ test('throwing storage falls back to the reduced-motion/default path (Review Foc
   expect(html().getAttribute('data-atmosphere')).toBe('reduced');
   expect(html().getAttribute('data-cover')).toBe('a');
 });
+test('values are escaped so a hostile slug cannot break out of the inline script', () => {
+  vi.spyOn(Math, 'random').mockReturnValue(0);
+  const src = bootScript({ storageKey: 'dw-atmosphere', buildDefault: 'full', slugs: ['</script><b>'] });
+  expect(src).not.toContain('</');
+  run(src);
+  expect(html().getAttribute('data-cover')).toBe('</script><b>');
+});
