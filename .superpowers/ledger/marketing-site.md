@@ -10,3 +10,4 @@ Branch: feat/marketing-site
 | 3 | feat: atmosphere level (ported) and pre-paint boot script | level (7), boot (3); build, check, test:build pass | boot script inlined in Base; coverSlugs prop |
 | 4 | feat: atmosphere hold gate (ported visibility + battery hold) | hold (4) | ported hold/release + visibility/battery sources |
 | 5 | feat: scroll depth anchors and easing | depth (6) | pure; consumed by field island |
+| 6 | feat: Descent field parameters from the round-1 handoff | field-params (8) | handoff §4 numbers verbatim |
