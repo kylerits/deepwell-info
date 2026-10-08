@@ -8,7 +8,11 @@ This is the marketing site for **Deepwell**, served at **readdeepwell.com**. Dee
 
 The site introduces Deepwell while keeping an air of mystery. Visually it echoes the app, with the art direction turned up to 11: interactive WebGL scenes built to produce **quiet thalassophobia**.
 
-**Status:** greenfield. No framework, build tooling or package manager has been chosen yet. The repo is on GitHub at `kylerits/deepwell-info` (private). Add commands here once a stack exists, and don't assume any before that.
+**Status:** in build (plan `~/projects/Deepwell/docs/plans/2026-10-08-marketing-site.md`). Stack: Astro 7 (static) + Svelte 5 islands, deployed as a Cloudflare Worker with static assets (`wrangler.jsonc`), waitlist in D1. pnpm 11, Node ≥22.13. Repo: GitHub `kylerits/deepwell-info` (private).
+- `pnpm dev`: local dev server (http://localhost:4321)
+- `pnpm test`: unit tests (Vitest) · `pnpm test:build`: build-output tests · `pnpm test:e2e`: Playwright (builds pilot and public first)
+- `pnpm check`: Astro typecheck · `pnpm budget`: JS size budget
+- `PUBLIC_LAUNCH_STATE=pilot|public`: the launch switch (build time)
 
 ## The three Deepwell repos
 
