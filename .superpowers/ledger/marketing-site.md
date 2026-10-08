@@ -7,3 +7,4 @@ Branch: feat/marketing-site
 |---|---|---|---|
 | 1 | | build smoke | scaffold |
 | 2 | feat: vendored tokens, fonts, logo; base layout; launch switch | launch (3), logo geometry (1), build no-third-party (6) | vendored foundation + launch switch |
+| 3 | feat: atmosphere level (ported) and pre-paint boot script | level (7), boot (3); build, check, test:build pass | boot script inlined in Base; coverSlugs prop |

@@ -2,18 +2,22 @@
 import '../styles/tokens.css';
 import '../styles/acs-tokens.css';
 import '../styles/fonts.css';
-interface Props { title?: string; description?: string; path?: string }
+import { bootScript } from '../lib/boot';
+import { ATMOSPHERE_STORAGE_KEY, BUILD_DEFAULT } from '../lib/atmosphere/level';
+interface Props { title?: string; description?: string; path?: string; coverSlugs?: readonly string[] }
 const {
   title = 'Deepwell — A cozy reader for the SCP Wiki',
   description = 'Read the SCP Wiki the way it deserves — offline, distraction-free, beautifully set. 19,000+ anomalies, three themes, always free to read. An unofficial reader.',
   path = '/',
+  coverSlugs = [],
 } = Astro.props;
 const canonical = new URL(path, Astro.site).href;
 ---
 <!doctype html>
-<html lang="en" data-theme="dark" data-atmosphere="full">
+<html lang="en" data-theme="dark" data-atmosphere={BUILD_DEFAULT}>
   <head>
     <meta charset="utf-8" />
+    <script is:inline set:html={bootScript({ storageKey: ATMOSPHERE_STORAGE_KEY, buildDefault: BUILD_DEFAULT, slugs: coverSlugs })} />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
