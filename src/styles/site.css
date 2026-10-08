@@ -70,12 +70,12 @@ body { margin: 0; }
 
 /* Text recedes rather than ends: one opacity step per line (lit-void body / statement ramps). */
 .recede {
-  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,.97) 0 1lh, rgba(0,0,0,.92) 1lh 2lh, rgba(0,0,0,.86) 2lh 3lh, rgba(0,0,0,.78) 3lh 4lh, rgba(0,0,0,.70) 4lh 5lh, rgba(0,0,0,.62) 5lh);
-  mask-image: linear-gradient(to bottom, rgba(0,0,0,.97) 0 1lh, rgba(0,0,0,.92) 1lh 2lh, rgba(0,0,0,.86) 2lh 3lh, rgba(0,0,0,.78) 3lh 4lh, rgba(0,0,0,.70) 4lh 5lh, rgba(0,0,0,.62) 5lh);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,.97) 0 1lh, rgba(0,0,0,.92) 1lh 2lh, rgba(0,0,0,.86) 2lh 3lh, rgba(0,0,0,.78) 3lh 4lh, rgba(0,0,0,.70) 4lh 5lh, rgba(0,0,0,.66) 5lh);
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,.97) 0 1lh, rgba(0,0,0,.92) 1lh 2lh, rgba(0,0,0,.86) 2lh 3lh, rgba(0,0,0,.78) 3lh 4lh, rgba(0,0,0,.70) 4lh 5lh, rgba(0,0,0,.66) 5lh);
 }
 .recede-slow {
-  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,.97) 0 2lh, rgba(0,0,0,.92) 2lh 4lh, rgba(0,0,0,.86) 4lh 6lh, rgba(0,0,0,.78) 6lh 8lh, rgba(0,0,0,.70) 8lh 10lh, rgba(0,0,0,.62) 10lh);
-  mask-image: linear-gradient(to bottom, rgba(0,0,0,.97) 0 2lh, rgba(0,0,0,.92) 2lh 4lh, rgba(0,0,0,.86) 4lh 6lh, rgba(0,0,0,.78) 6lh 8lh, rgba(0,0,0,.70) 8lh 10lh, rgba(0,0,0,.62) 10lh);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,.97) 0 2lh, rgba(0,0,0,.92) 2lh 4lh, rgba(0,0,0,.86) 4lh 6lh, rgba(0,0,0,.78) 6lh 8lh, rgba(0,0,0,.70) 8lh 10lh, rgba(0,0,0,.66) 10lh);
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,.97) 0 2lh, rgba(0,0,0,.92) 2lh 4lh, rgba(0,0,0,.86) 4lh 6lh, rgba(0,0,0,.78) 6lh 8lh, rgba(0,0,0,.70) 8lh 10lh, rgba(0,0,0,.66) 10lh);
 }
 .recede-h {
   -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,.97) 0 1lh, rgba(0,0,0,.84) 1lh 2lh, rgba(0,0,0,.70) 2lh 3lh, rgba(0,0,0,.54) 3lh);
@@ -247,10 +247,7 @@ html:not([data-js]) .atmo { display: none; }   /* the atmosphere switch needs JS
 @media (max-width: 560px) {
   .top { padding-top: 24px; }
   .logo { width: 176px; }
-  .reader { padding: 28px 26px 72px; }
-  .reader--sm { padding: 24px 24px 64px; }
   .reader__title { font-size: 23px; }
   .reader__mark { position: static; display: block; margin: 0 0 4px; }
-  .cover__page { min-height: 500px; padding: 26px 24px 24px; }
   .h-deep { letter-spacing: -0.02em; }
 }

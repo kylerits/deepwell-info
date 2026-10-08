@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { expect, test } from 'vitest';
 
 type RGB = [number, number, number];
@@ -10,15 +11,26 @@ const INK: RGB = [234, 223, 198];
 const DARKEST: RGB = [6, 5, 9];      // d=1 base under volume 2 at full strength
 const LIT: RGB = [56, 58, 64];       // hero, under shaft 1 + bloom at full (conservative)
 
-test('body ramp floor .62 stays ≥ 4.5:1 on the darkest field frame (handoff README: verify against the darkest frame)', () => {
-  expect(ratio(over(INK, 0.62, DARKEST), DARKEST)).toBeGreaterThanOrEqual(4.5);
+// Read the shipped ramps: the last opacity step of each mask-image gradient.
+const css = readFileSync(new URL('../../src/styles/site.css', import.meta.url), 'utf8');
+const floor = (sel: string): number => {
+  const m = new RegExp(`^${sel.replace('.', '\\.')} \\{[^}]*?\\n\\s*mask-image:([^;]+);`, 'm').exec(css);
+  expect(m, `${sel} mask-image`).not.toBeNull();
+  const steps = [...m![1]!.matchAll(/rgba\(0,0,0,([\d.]+)\)/g)].map((x) => Number(x[1]));
+  return steps[steps.length - 1]!;
+};
+const BODY = Math.min(floor('.recede'), floor('.recede-slow'));
+const HEAD = floor('.recede-h');
+
+test('shipped ramp floors are the pinned ones (.66 body, .54 headline)', () => {
+  expect(floor('.recede')).toBe(0.66);
+  expect(floor('.recede-slow')).toBe(0.66);
+  expect(HEAD).toBe(0.54);
 });
-// Brief asked for 4.5 here too, but .62 ink on the conservative LIT frame is 4.38:1. The .62 step only
-// applies 5+ lines into a paragraph, well below the lit hero, so the lit-frame pin is 4:1.
-test('body ramp floor .62 stays ≥ 4:1 on the most-lit field frame', () => {
-  expect(ratio(over(INK, 0.62, LIT), LIT)).toBeGreaterThanOrEqual(4);
+test('body ramp floor .66 stays ≥ 4.5:1 on the darkest and the most-lit field frame', () => {
+  for (const bg of [DARKEST, LIT]) expect(ratio(over(INK, BODY, bg), bg)).toBeGreaterThanOrEqual(4.5);
 });
 test('headline ramp floor .54 stays ≥ 4.5:1 on the darkest frame and ≥ 3:1 (large text) when lit', () => {
-  expect(ratio(over(INK, 0.54, DARKEST), DARKEST)).toBeGreaterThanOrEqual(4.5);
-  expect(ratio(over(INK, 0.54, LIT), LIT)).toBeGreaterThanOrEqual(3);
+  expect(ratio(over(INK, HEAD, DARKEST), DARKEST)).toBeGreaterThanOrEqual(4.5);
+  expect(ratio(over(INK, HEAD, LIT), LIT)).toBeGreaterThanOrEqual(3);
 });

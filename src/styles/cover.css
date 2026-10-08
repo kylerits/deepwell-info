@@ -127,4 +127,9 @@
 .cover__attr a { color: var(--ink); text-decoration: underline; text-decoration-color: rgba(234, 223, 198, 0.35); text-underline-offset: 3px; }
 .cover__attr a:hover { text-decoration-color: var(--ink); }
 
-@media (max-width: 560px) { .cover__page { min-height: 500px; padding: 26px 24px 24px; } }
+@media (max-width: 560px) {
+  .cover__page { min-height: 500px; padding: 26px 24px 24px; }
+  /* Phone padding for the reader lives here, after the base .reader rules (site.css loads first). */
+  .reader { padding: 28px 26px 72px; }
+  .reader--sm { padding: 24px 24px 64px; }
+}
