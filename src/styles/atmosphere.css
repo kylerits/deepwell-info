@@ -1,0 +1,85 @@
+/* Atmosphere layers. Ported idioms from ~/git_local/deepwell/apps/web/src/lib/atmosphere/atmosphere.css (gates, hold) + values from the round-1 handoff landing.css. Decorative only; never over copy. */
+/* Static field: shown when JS is off, at level off, or without WebGL2 (spec: "two CSS shafts"). */
+.field-static { position: absolute; inset: 0; z-index: -3; pointer-events: none; }
+html[data-field="webgl"] .field-static { display: none; }
+.volumes { position: absolute; inset: 0; pointer-events: none; }
+.volumes--page {
+  background:
+    radial-gradient(1100px 760px at 86% 3%, rgba(30, 25, 40, 0.55), transparent 70%),
+    radial-gradient(1500px 1000px at 16% 19%, rgba(8, 7, 11, 0.42), transparent 72%),
+    radial-gradient(2000px 1400px at 90% 36%, rgba(28, 23, 37, 0.42), transparent 72%),
+    radial-gradient(2600px 1800px at 8% 56%, rgba(6, 5, 9, 0.5), transparent 72%),
+    radial-gradient(3300px 2300px at 94% 76%, rgba(23, 19, 31, 0.36), transparent 72%),
+    radial-gradient(4200px 3000px at 30% 100%, rgba(5, 4, 8, 0.6), transparent 72%);
+}
+.shaft {
+  position: absolute; top: 0; display: block;
+  transform-origin: 50% 0;
+  mix-blend-mode: screen;
+  background: linear-gradient(to bottom, rgba(178, 208, 204, 1) 0%, rgba(178, 208, 204, 0.5) 38%, rgba(178, 208, 204, 0) 100%);
+  -webkit-mask-image: conic-gradient(from 0deg at 50% -9%, transparent 0deg 165deg, #000 173deg 187deg, transparent 195deg 360deg);
+  mask-image: conic-gradient(from 0deg at 50% -9%, transparent 0deg 165deg, #000 173deg 187deg, transparent 195deg 360deg);
+}
+.shaft--thin {
+  -webkit-mask-image: conic-gradient(from 0deg at 50% -9%, transparent 0deg 173.5deg, #000 178deg 182deg, transparent 186.5deg 360deg);
+  mask-image: conic-gradient(from 0deg at 50% -9%, transparent 0deg 173.5deg, #000 178deg 182deg, transparent 186.5deg 360deg);
+}
+.shaft--s2 { left: calc(6% - 336px); top: -240px; width: 673px; height: 1150px; opacity: 0.14; transform: rotate(-21deg); }
+.shaft--s5 { left: calc(30% - 182px); top: -240px; width: 365px; height: 1350px; opacity: 0.075; transform: rotate(-7deg); }
+
+/* WebGL canvas: fixed, behind everything, fades in after first paint. */
+.field { position: fixed; inset: 0; width: 100%; height: 100%; z-index: -4; pointer-events: none; opacity: 0; transition: opacity 600ms var(--ease); }
+html[data-field="webgl"] .field { opacity: 1; }
+html[data-atmosphere="off"] .field { display: none; }
+
+.tube {
+  position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background-image:
+    repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.34) 0 1px, rgba(0, 0, 0, 0) 1px 2px),
+    repeating-linear-gradient(to right, rgba(255, 80, 80, 0.03) 0 1px, rgba(80, 255, 140, 0.025) 1px 2px, rgba(90, 140, 255, 0.03) 2px 3px);
+}
+.tube::after {
+  content: ""; position: absolute; inset: 0;
+  background-image: url(/atmos/grain.png);
+  background-size: 192px 192px;
+  opacity: 0.6;
+}
+.tube--side {
+  -webkit-mask-image: linear-gradient(90deg, transparent calc(var(--gut) + 700px), #000 calc(var(--gut) + 900px));
+  mask-image: linear-gradient(90deg, transparent calc(var(--gut) + 700px), #000 calc(var(--gut) + 900px));
+}
+.tube--edge {
+  -webkit-mask-image:
+    linear-gradient(to bottom, #000 0, transparent 64px, transparent calc(100% - 64px), #000 100%),
+    linear-gradient(90deg, transparent calc(var(--gut) + 1180px), #000 calc(var(--gut) + 1240px));
+  mask-image:
+    linear-gradient(to bottom, #000 0, transparent 64px, transparent calc(100% - 64px), #000 100%),
+    linear-gradient(90deg, transparent calc(var(--gut) + 1180px), #000 calc(var(--gut) + 1240px));
+}
+.vignette {
+  position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(ellipse 120% 96% at 56% 46%, transparent 58%, rgba(4, 3, 7, 0.5) 100%);
+}
+.osd {
+  position: fixed; left: 22px; bottom: 18px; z-index: 6; pointer-events: none;
+  font-family: var(--f-type); font-size: 12.5px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(234, 223, 198, 0.58); white-space: pre;
+}
+
+@media (max-width: 900px) {
+  .tube--side { -webkit-mask-image: linear-gradient(to bottom, #000 0, transparent 64px, transparent calc(100% - 64px), #000 100%);
+                mask-image: linear-gradient(to bottom, #000 0, transparent 64px, transparent calc(100% - 64px), #000 100%); }
+}
+@media (max-width: 560px) { .osd { font-size: 11px; left: 16px; bottom: 14px; } }
+
+/* Levels (handoff §4 "levels as prototyped"; the spec governs). */
+html[data-atmosphere="full"] .tube::after { animation: dw-grain 1.1s steps(5) infinite; }
+html[data-atmosphere="reduced"] .tube { opacity: 0.7; }
+html[data-atmosphere="off"] :is(.tube, .osd, .vignette) { display: none; }
+@keyframes dw-grain {
+  0% { background-position: 0 0; } 20% { background-position: -37px 21px; } 40% { background-position: 53px -46px; }
+  60% { background-position: -18px 64px; } 80% { background-position: 71px 9px; } 100% { background-position: 0 0; }
+}
+/* Gates, as the app: the OS preference, then hold (tab hidden / battery saver). */
+@media (prefers-reduced-motion: reduce) { .tube::after { animation: none !important; } }
+html[data-atmosphere-held] .tube::after { animation-play-state: paused !important; }
