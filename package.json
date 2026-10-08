@@ -11,7 +11,7 @@
     "build": "astro build",
     "build:pilot": "PUBLIC_LAUNCH_STATE=pilot ASTRO_OUT_DIR=dist-pilot astro build",
     "build:public": "PUBLIC_LAUNCH_STATE=public ASTRO_OUT_DIR=dist-public astro build",
-    "check": "astro check",
+    "check": "astro check && tsc -p worker",
     "test": "vitest run",
     "test:build": "COVER_DEFAULT=scp-173 pnpm build:pilot && COVER_DEFAULT=scp-173 pnpm build:public && vitest run --config vitest.build.config.ts",
     "test:e2e": "pnpm build:pilot && pnpm build:public && playwright test",
