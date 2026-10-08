@@ -1,0 +1,19 @@
+---
+import Logo from '../brand/Logo.astro';
+import { ABOUT_URL, APP_URL, CONTACT_EMAIL, INSTAGRAM_URL, PRESS_URL } from '../../config/site';
+const links = [
+  { label: 'Read', href: APP_URL }, { label: 'Pricing', href: '#pricing' },
+  ABOUT_URL && { label: 'About', href: ABOUT_URL }, PRESS_URL && { label: 'Press', href: PRESS_URL },
+  INSTAGRAM_URL && { label: 'Instagram', href: INSTAGRAM_URL }, { label: 'Contact', href: `mailto:${CONTACT_EMAIL}` },
+].filter(Boolean) as { label: string; href: string }[];
+---
+<footer class="foot-sec" data-depth="1">
+  <div class="tube tube--edge" aria-hidden="true"></div>
+  <div class="wrap foot">
+    <Logo />
+    <nav aria-label="Footer"><ul class="foot__links">{links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}</ul></nav>
+    <p class="foot__disc">An unofficial reader for the SCP Wiki. Not affiliated with or endorsed by the SCP Wiki.</p>
+    <p class="foot__attr">SCP content © its authors, licensed CC BY-SA 3.0. SCP logo by Aelanna, CC BY-SA 3.0. Deepwell name and logo © Deepwell.</p>
+    <div data-atmo-switch></div>
+  </div>
+</footer>

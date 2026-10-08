@@ -15,6 +15,7 @@ describe.skipIf(!existsSync(MD))('page copy matches landing-page.md exactly', ()
   for (const out of ['dist-pilot', 'dist-public']) {
     const page = text(`${out}/index.html`);
     for (const s of BUILT) test(`${out} §${s} ${SECTIONS[s]}`, () => {
+      expect(copy[s]?.length ?? 0).toBeGreaterThan(0);
       for (const line of copy[s]!) expect(page, `missing: ${line}`).toContain(line);
     });
   }
