@@ -37,3 +37,16 @@ test('a storage failure is a 500, never a false success', async () => {
   const r = await handleWaitlist(post({ email: 'a@b.co' }), deps({ insert: vi.fn(async () => { throw new Error('D1 down'); }) }));
   expect(r.status).toBe(500);
 });
+test('no-JS failure: 303 to the error page, never back to a silent form', async () => {
+  const html = { Accept: 'text/html' };
+  for (const r of [
+    await handleWaitlist(post({ email: 'nope' }, html), deps()),
+    await handleWaitlist(post({ email: 'a@b.co' }, html), deps({ limit: vi.fn(async () => false) })),
+    await handleWaitlist(post({ email: 'a@b.co' }, html), deps({ insert: vi.fn(async () => { throw new Error('D1 down'); }) })),
+  ]) { expect(r.status).toBe(303); expect(r.headers.get('Location')).toBe('/waitlist/error/'); }
+});
+test('a rate-limiter failure fails open: the sign-up is still stored', async () => {
+  const d = deps({ limit: vi.fn(async () => { throw new Error('limiter down'); }) });
+  const r = await handleWaitlist(post({ email: 'a@b.co' }), d);
+  expect(r.status).toBe(200); expect(d.insert).toHaveBeenCalledWith('a@b.co', '2026-10-08T12:00:00.000Z');
+});

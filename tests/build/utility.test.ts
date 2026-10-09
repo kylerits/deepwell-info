@@ -14,6 +14,16 @@ test('404 (landing-page.md §11)', () => {
 test('waitlist confirmation', () => {
   expect(text('dist-pilot/waitlist/confirmed/index.html').t).toContain(normalizeCopy('Noted. Your name is in the personnel file. We’ll be in touch exactly once, when your access is ready.'));
 });
+test('waitlist error (no-JS failure): plain error plus a retry form that posts without JS', () => {
+  const { d, t } = text('dist-pilot/waitlist/error/index.html');
+  expect(t).toContain(normalizeCopy('Your sign-up didn’t go through. Check that your email address is complete and try again below. If it still fails, wait a minute and retry.'));
+  expect(d.querySelector('[role="alert"]')).not.toBeNull();
+  const f = d.querySelector('form[data-waitlist]')!;
+  expect(f.getAttribute('method')).toBe('post'); expect(f.getAttribute('action')).toBe('/api/waitlist');
+  expect(d.querySelector('label[for="retry-email"]')!.textContent).toBe('Email address');
+  expect(f.querySelector('button.btn')!.classList.contains('btn--secondary')).toBe(false);
+  expect(d.querySelector('a.btn.btn--secondary[href="/"]')!.textContent).toContain('Back to the archive');
+});
 test('offline', () => {
   expect(text('dist-pilot/offline/index.html').t).toContain(normalizeCopy('You appear to be offline. Good field practice, but you’ll need a connection for this part.'));
 });

@@ -20,9 +20,13 @@ export async function handleWaitlist(req: Request, deps: WaitlistDeps): Promise<
   if (origin && !ALLOWED_ORIGINS.has(origin)) return new Response('Forbidden', { status: 403 });
   const wantsJson = (req.headers.get('Accept') ?? '').includes('application/json');
   const ok = () => (wantsJson ? json(200, { ok: true }) : see('/waitlist/confirmed/'));
-  const fail = (status: number, error: string) => (wantsJson ? json(status, { ok: false, error }) : see('/?waitlist=error#start'));
+  const fail = (status: number, error: string) => (wantsJson ? json(status, { ok: false, error }) : see('/waitlist/error/'));
 
-  if (!(await deps.limit(req.headers.get('CF-Connecting-IP') ?? 'unknown'))) return fail(429, 'rate_limited');
+  // A limiter outage fails open: the honeypot and INSERT OR IGNORE still guard the table,
+  // and a Cloudflare fault shouldn't turn away real sign-ups.
+  let allowed = true;
+  try { allowed = await deps.limit(req.headers.get('CF-Connecting-IP') ?? 'unknown'); } catch { /* fail open */ }
+  if (!allowed) return fail(429, 'rate_limited');
   let form: FormData;
   try { form = await req.formData(); } catch { return fail(400, 'bad_request'); }
   if (String(form.get('company') ?? '').trim() !== '') return ok();

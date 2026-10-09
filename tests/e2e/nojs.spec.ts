@@ -11,3 +11,13 @@ test('JS off: copy, the CTA and exactly one cover still render', async ({ page }
   await expect(page.locator('.atmo')).toBeHidden();
   await expect(page.locator('[data-osd-time]')).toHaveText('00:14:07');
 });
+test('JS off: a failed waitlist post lands on the plain error page with a retry form', async ({ page }, info) => {
+  test.skip(info.project.name !== 'pilot', 'pilot only');
+  await page.route('**/api/waitlist', (r) => r.fulfill({ status: 303, headers: { Location: '/waitlist/error/' } }));
+  await page.goto('/');
+  await page.locator('#final-email').fill('agent@example.com');
+  await page.getByRole('button', { name: 'Join the waitlist' }).click();
+  await expect(page).toHaveURL(/\/waitlist\/error\/$/);
+  await expect(page.getByRole('alert')).toHaveText('Your sign-up didn’t go through. Check that your email address is complete and try again below. If it still fails, wait a minute and retry.');
+  await expect(page.locator('#retry-email')).toBeVisible();
+});

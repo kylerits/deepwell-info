@@ -103,6 +103,8 @@ body { margin: 0; }
   transition: background-color 120ms var(--ease);
 }
 .btn:hover { background: #F4EBD6; }
+.btn--secondary { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1px #4A4054; transition: box-shadow 120ms var(--ease); }
+.btn--secondary:hover { background: transparent; box-shadow: inset 0 0 0 1px var(--ink-soft); }
 .micro { font: 400 14px/1.5 var(--f-ui); color: var(--ink-soft); margin: 14px 0 0; }
 .btn:focus-visible, .atmo-btn:focus-visible, .foot a:focus-visible, .top__logo:focus-visible,
 .cover__read:focus-visible, .cover__attr a:focus-visible {
