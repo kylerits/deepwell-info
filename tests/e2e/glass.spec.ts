@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { open, scrollToFraction } from './helpers';
-test.beforeEach(({}, info) => test.skip(info.project.name !== 'pilot', 'state-independent'));
+// State-independent, so pilot only, except coverage: the hero and final CTA differ between states.
+test.beforeEach(({}, info) => test.skip(info.project.name !== 'pilot' && !info.title.startsWith('coverage'), 'state-independent'));
 // The GPU compositor under SwiftShader re-blurs every smudge per frame, so a screenshot takes 2–30 s;
 // the CPU compositor renders the same frame (WebGL and blur intact) in ~0.5 s. Same args as the
 // config's chromium project, plus that one.
@@ -27,13 +28,22 @@ test('the glass is hidden at 900px and below', async ({ page }) => {
 
 const SURFACES = '.cover, .reader, .tcard__page, .osd';
 
-test('coverage: every visible text element on the glass has a .smudge ancestor (Review Focus 1)', async ({ page }) => {
+test('coverage: every visible text node on the glass has a .smudge ancestor (Review Focus 1)', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await open(page);
-  const bare = await page.evaluate((surfaces) => [...document.querySelectorAll('main :is(p, h1, h2, h3, li, a, label, figcaption, button)')]
-    .filter((el) => { const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== 'hidden'; })
-    .filter((el) => !el.closest(surfaces) && !el.closest('.smudge'))
-    .map((el) => `${el.tagName.toLowerCase()}.${el.className} :: ${el.textContent!.trim().slice(0, 40)}`), SURFACES);
+  const bare = await page.evaluate((surfaces) => {
+    const out: string[] = [];
+    const walk = document.createTreeWalker(document.querySelector('main')!, NodeFilter.SHOW_TEXT);
+    for (let n = walk.nextNode(); n; n = walk.nextNode()) {
+      const el = n.parentElement!;
+      if (!n.textContent!.trim() || el.closest(surfaces) || el.closest('.smudge')) continue;
+      if (getComputedStyle(el).visibility === 'hidden') continue;
+      const r = document.createRange(); r.selectNodeContents(n);
+      if (![...r.getClientRects()].some((q) => q.width > 1 && q.height > 1)) continue; // hidden, or visually-hidden (1px clip)
+      out.push(`${el.tagName.toLowerCase()}.${el.className} :: ${n.textContent!.trim().slice(0, 40)}`);
+    }
+    return out;
+  }, SURFACES);
   expect(bare).toEqual([]);
 });
 test('mechanics: no .smudge creates a stacking context, so every blur sees the glass (Review Focus 2)', async ({ page }) => {
@@ -47,6 +57,19 @@ test('mechanics: no .smudge creates a stacking context, so every blur sees the g
     return ok ? null : el.className;
   }).filter(Boolean));
   expect(bad).toEqual([]);
+  // A backdrop root anywhere from the smudge up to <html> also cuts the blur off from the glass.
+  const roots = await page.evaluate(() => [...document.querySelectorAll('.smudge')].flatMap((smudge) => {
+    const hits: string[] = [];
+    for (let el: Element | null = smudge; el; el = el.parentElement) {
+      const s = getComputedStyle(el);
+      const ok = s.opacity === '1' && s.filter === 'none' && s.maskImage === 'none' && s.clipPath === 'none'
+        && s.backdropFilter === 'none' && s.mixBlendMode === 'normal'
+        && !/opacity|filter|mask|clip-path|mix-blend-mode/.test(s.willChange);
+      if (!ok) hits.push(`${smudge.className} ← ${el.tagName.toLowerCase()}.${el.className}`);
+    }
+    return hits;
+  }));
+  expect(roots).toEqual([]);
 });
 test('fallbacks: forced colours hide the smudge; more contrast drops the blur and darkens the tint', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -76,7 +99,7 @@ test('contrast: text holds its floors over the brightest backdrop in every secti
   await open(page);
   await expect(page.locator('html')).toHaveAttribute('data-field', 'webgl');
   await page.addStyleTag({ content: 'html.hide-text main :is(p, h1, h2, h3, li, a, span, strong, label, figcaption, em, sup) { color: transparent !important; text-decoration-color: transparent !important; }' });
-  for (const sel of ['#top', '.sec--trust', '#problem', '#module-01', '#themes', '#pricing', '#licensing', '#faq', '#start', 'footer']) {
+  for (const sel of ['#top', '.sec--trust', '#problem', '#module-01', '#module-02', '#module-03', '#themes', '#pricing', '#licensing', '#faq', '#start', 'footer']) {
     await page.evaluate((s) => { const el = document.querySelector(s)!; scrollTo(0, el.getBoundingClientRect().top + scrollY - 120); }, sel);
     await page.waitForTimeout(900);
     const boxes = await page.evaluate(([s, surfaces]) => [...document.querySelector(s)!.querySelectorAll('p, h1, h2, h3, li')]

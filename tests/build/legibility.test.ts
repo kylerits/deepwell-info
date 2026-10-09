@@ -45,3 +45,8 @@ test('the minifier never folds a scroll timeline into the animation shorthand (C
   expect(css).toContain('animation-timeline:scroll(root)');
   expect(css).not.toMatch(/animation:[^;}]*scroll\(/);
 });
+test('the build keeps -webkit-backdrop-filter and its @supports branch (Safari ≤ 17 has only the prefix)', () => {
+  const css = readdirSync('dist-pilot/_astro').filter((n) => n.endsWith('.css')).map((n) => readFileSync(`dist-pilot/_astro/${n}`, 'utf8')).join('\n');
+  expect(css).toMatch(/\.smudge:before\{[^}]*-webkit-backdrop-filter:blur\(10px\)/);
+  expect(css).toMatch(/@supports not \(\(-webkit-backdrop-filter:blur\(1px\)\) or \(backdrop-filter:blur\(1px\)\)\)/);
+});

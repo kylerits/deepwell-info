@@ -27,28 +27,29 @@ html[data-field="webgl"] .field-static { display: none; }
 .shaft--s2 { left: calc(6% - 336px); top: -240px; width: 673px; height: 1150px; opacity: 0.14; transform: rotate(-21deg); }
 .shaft--s5 { left: calc(30% - 182px); top: -240px; width: 365px; height: 1350px; opacity: 0.075; transform: rotate(-7deg); }
 
-/* Static parallax (atmosphere-layers spec, Part 2). Where scroll timelines exist, the static field
-   is fixed to the screen, like the WebGL canvas: the shafts fade out over the first 15% of the page
-   (as the WebGL shafts dim with depth; a fade, not motion, so it runs at every level), and the
-   volumes drift up 800px over the whole page at full motion only. Without scroll timelines the
-   static field scrolls with the page, as before. The animation shorthand resets the timeline, so
-   animation-timeline must follow it, and in its own rule (same specificity, later): in one rule,
-   the build minifier folds it into the shorthand, which Chrome rejects whole. */
+/* Static parallax (atmosphere-layers spec, Part 2), on the landing page only (.field-static--descent;
+   utility pages are too short for an 800px drift). Where scroll timelines exist, the shafts fade out
+   over the first 15% of the page (as the WebGL shafts dim with depth; a fade, not motion, so it runs
+   at every level). At full motion the field is fixed to the screen, like the WebGL canvas, and the
+   volumes drift up 800px over the whole page; held, it stays fixed and the drift is 0. Otherwise it
+   scrolls with the page, as before, so it still darkens with the descent. The animation shorthand
+   resets the timeline, so animation-timeline must follow it, and in its own rule (same specificity,
+   later): in one rule, the build minifier folds it into the shorthand, which Chrome rejects whole. */
 @supports (animation-timeline: scroll()) {
-  .field-static { position: fixed; }
-  .field-static .shaft { animation: dw-shaft-fade linear both; animation-range: 0% 15%; }
-  .field-static > .shaft { animation-timeline: scroll(root); }
-  .field-static .volumes--page {
-    bottom: auto; height: calc(100vh + 800px);
-    background:
-      radial-gradient(1100px 760px at 86% 3%, rgba(30, 25, 40, 0.55), transparent 70%),
-      radial-gradient(1500px 1000px at 16% 40%, rgba(8, 7, 11, 0.42), transparent 72%),
-      radial-gradient(2000px 1400px at 90% 70%, rgba(28, 23, 37, 0.42), transparent 72%),
-      radial-gradient(2600px 1800px at 30% 100%, rgba(5, 4, 8, 0.6), transparent 72%);
-  }
+  .field-static--descent .shaft { animation: dw-shaft-fade linear both; animation-range: 0% 15%; }
+  .field-static--descent > .shaft { animation-timeline: scroll(root); }
   @media (prefers-reduced-motion: no-preference) {
-    html[data-atmosphere="full"]:not([data-atmosphere-held]) .field-static .volumes--page { animation: dw-drift linear both; }
-    html[data-atmosphere="full"]:not([data-atmosphere-held]) .field-static > .volumes--page { animation-timeline: scroll(root); }
+    html[data-atmosphere="full"] .field-static--descent { position: fixed; }
+    html[data-atmosphere="full"] .field-static--descent .volumes--page {
+      bottom: auto; height: calc(100vh + 800px);
+      background:
+        radial-gradient(1100px 760px at 86% 3%, rgba(30, 25, 40, 0.55), transparent 70%),
+        radial-gradient(1500px 1000px at 16% 40%, rgba(8, 7, 11, 0.42), transparent 72%),
+        radial-gradient(2000px 1400px at 90% 70%, rgba(28, 23, 37, 0.42), transparent 72%),
+        radial-gradient(2600px 1800px at 30% 100%, rgba(5, 4, 8, 0.6), transparent 72%);
+    }
+    html[data-atmosphere="full"]:not([data-atmosphere-held]) .field-static--descent .volumes--page { animation: dw-drift linear both; }
+    html[data-atmosphere="full"]:not([data-atmosphere-held]) .field-static--descent > .volumes--page { animation-timeline: scroll(root); }
   }
 }
 @keyframes dw-shaft-fade { to { opacity: 0; } }
@@ -80,10 +81,13 @@ html[data-atmosphere="off"] .field { display: none; }
 }
 /* Smudges: grime on the glass behind each block of text (atmosphere-layers spec, Part 1; the
    lit-void CRT stack's "Grime" layer). The ::before joins .dw's stacking context at z -1, after
-   the tube in DOM order, so its backdrop is the glass, vignette and field. A .smudge must never
-   create a stacking context (z-index, opacity, filter, isolation, transform, mask), or it becomes
-   a backdrop root and the blur sees nothing. The smudge is behind the text, never an ancestor of
-   it, and its edges dissolve: no border, radius or shadow. */
+   the tube in DOM order, so its backdrop is the glass, vignette and field. Neither a .smudge nor
+   any ancestor up to <html> may become a backdrop root (opacity < 1, filter, mask, clip-path,
+   mix-blend-mode, backdrop-filter, or will-change on any of them), or the blur sees only what is
+   inside that root and the smudge turns into a flat tint. (z-index, isolation and transform do not
+   break the blur, but a .smudge stays free of them so its ::before joins .dw's context as above.)
+   The smudge is behind the text, never an ancestor of it, and its edges dissolve: no border,
+   radius or shadow. */
 .smudge { position: relative; }
 .smudge::before {
   content: ""; position: absolute; z-index: -1; pointer-events: none;

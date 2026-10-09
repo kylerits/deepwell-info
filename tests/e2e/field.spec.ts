@@ -59,6 +59,7 @@ test('static field: fixed; volumes drift up 800px over the page; shafts fade out
   await expect(page.locator('html')).toHaveAttribute('data-field', 'static');
   const top = await at(page, 0);
   expect(top).toEqual({ pos: 'fixed', ty: 0, shaft: expect.closeTo(0.14, 2) });
+  expect((await at(page, 0.15)).shaft).toBeCloseTo(0, 2);
   const mid = await at(page, 0.5);
   expect(mid.ty).toBeCloseTo(-400, -1); // within ±5px
   expect(mid.shaft).toBe(0);
@@ -69,11 +70,20 @@ test('static field holds still when reduced, off or held (Review Focus 5)', asyn
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
-  expect((await at(page, 0.5)).ty).toBe(0);
+  // Not drifting, the field scrolls with the page, as before, so it still darkens as you descend.
+  expect(await at(page, 0.5)).toMatchObject({ pos: 'absolute', ty: 0 });
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.getByRole('button', { name: 'Reduced' }).click();
-  expect((await at(page, 0.5)).ty).toBe(0);
+  expect(await at(page, 0.5)).toMatchObject({ pos: 'absolute', ty: 0 });
+  await page.getByRole('button', { name: 'Off' }).click();
+  expect(await at(page, 0.5)).toMatchObject({ pos: 'absolute', ty: 0 });
   await page.getByRole('button', { name: 'Full' }).click();
   await page.evaluate(() => document.documentElement.setAttribute('data-atmosphere-held', ''));
-  expect((await at(page, 0.5)).ty).toBe(0);
+  expect(await at(page, 0.5)).toMatchObject({ pos: 'fixed', ty: 0 });
+});
+test('utility pages keep the static field as it was: no drift, no shaft fade (review Important 1)', async ({ page }) => {
+  await page.setViewportSize({ width: 1366, height: 600 });
+  await page.goto('/waitlist/error');
+  await expect(page.locator('html')).toHaveAttribute('data-atmosphere', 'full');
+  expect(await at(page, 1)).toEqual({ pos: 'absolute', ty: 0, shaft: expect.closeTo(0.14, 2) });
 });
