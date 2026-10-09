@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { breathAt, buildFrame } from './frame';
+import { PARALLAX, breathAt, buildFrame, riseAlong } from './frame';
 import { moteCount } from './field-params';
 
 const at = (o: Partial<Parameters<typeof buildFrame>[0]> = {}) => buildFrame({ d: 0, width: 1440, height: 900, timeMs: 0, motion: 'full', presence: 0, ...o });
@@ -49,4 +49,57 @@ test('base colour and volumes are packed for the shader', () => {
   const f = at({ d: 1 });
   expect(Array.from(f.base).map((v) => Math.round(v * 255))).toEqual([11, 10, 15]);
   expect(f.volA[2]).toBe(3600); expect(f.volC[7]).toBeCloseTo(0.75); expect(Array.from(f.volStop).map((v) => +v.toFixed(2))).toEqual([0.7, 0.72, 0.7]);
+});
+test('an absent scrollY is the same as 0, at full and at reduced', () => {
+  for (const motion of ['full', 'reduced'] as const) {
+    const a = at({ motion, timeMs: 4321 }), b = at({ motion, timeMs: 4321, scrollY: 0 });
+    expect(Array.from(b.motes)).toEqual(Array.from(a.motes));
+    expect(Array.from(b.volA)).toEqual(Array.from(a.volA));
+  }
+});
+test('volumes drift up at 0.08× scroll at full; no offset at reduced', () => {
+  const rest = at(), moved = at({ scrollY: 1000 });
+  for (let k = 0; k < 3; k++) {
+    expect(moved.volA[k * 4 + 1]).toBeCloseTo(rest.volA[k * 4 + 1]! - PARALLAX.volumes * 1000, 3);
+    expect(moved.volA[k * 4]).toBe(rest.volA[k * 4]); // x, rx, ry untouched
+  }
+  expect(Array.from(at({ motion: 'reduced', scrollY: 1000 }).volA)).toEqual(Array.from(at({ motion: 'reduced' }).volA));
+});
+test('shafts never move with scroll', () => {
+  expect(Array.from(at({ scrollY: 2500 }).shaftA)).toEqual(Array.from(at().shaftA));
+});
+test('riseAlong wraps into [0.1, 0.8), fades to 0 at the seam, and is identity-with-fade-1 for today’s seeds', () => {
+  for (let t = 0.2; t < 0.7; t += 0.01) expect(riseAlong(t, 0)).toEqual({ t: expect.closeTo(t, 9), fade: 1 });
+  for (const shift of [-3.7, -0.4, 0, 0.05, 0.35, 1, 12.6, 1e5]) {
+    const r = riseAlong(0.45, shift);
+    expect(r.t).toBeGreaterThanOrEqual(0.1); expect(r.t).toBeLessThan(0.8);
+    expect(r.fade).toBeGreaterThanOrEqual(0); expect(r.fade).toBeLessThanOrEqual(1);
+  }
+  expect(riseAlong(0.1, 0).fade).toBe(0);
+  expect(riseAlong(0.1 + 1e-9, 0).fade).toBeLessThan(1e-6);
+});
+test('motes rise as you descend: mean y falls with scroll at full', () => {
+  const meanY = (f: ReturnType<typeof at>) => { let s = 0; for (let j = 0; j < f.moteCount; j++) s += f.motes[j * 4 + 1]!; return s / f.moteCount; };
+  expect(meanY(at({ scrollY: 60 }))).toBeLessThan(meanY(at()));
+  expect(Array.from(at({ motion: 'reduced', scrollY: 600 }).motes)).toEqual(Array.from(at({ motion: 'reduced' }).motes));
+});
+test('no mote pops: a jump between adjacent scroll positions happens only while it is invisible (Review Focus 3)', () => {
+  let prev = at({ scrollY: 0 });
+  for (let s = 8; s <= 6000; s += 8) {
+    const cur = at({ scrollY: s });
+    expect(cur.moteCount).toBe(prev.moteCount);
+    for (let j = 0; j < cur.moteCount; j++) {
+      const dx = cur.motes[j * 4]! - prev.motes[j * 4]!, dy = cur.motes[j * 4 + 1]! - prev.motes[j * 4 + 1]!;
+      if (Math.hypot(dx, dy) > 12) expect(Math.min(cur.motes[j * 4 + 3]!, prev.motes[j * 4 + 3]!)).toBeLessThan(0.02);
+    }
+    prev = cur;
+  }
+});
+test('huge scroll positions stay finite and in range (Review Focus 4)', () => {
+  for (const s of [1e5, 3.3e6]) {
+    const f = at({ scrollY: s });
+    for (const v of f.motes) expect(Number.isFinite(v)).toBe(true);
+    for (const v of f.volA) expect(Number.isFinite(v)).toBe(true);
+    for (let j = 0; j < f.moteCount; j++) expect(f.motes[j * 4 + 3]!).toBeGreaterThanOrEqual(0);
+  }
 });

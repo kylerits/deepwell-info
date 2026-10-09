@@ -65,7 +65,7 @@
       osdAt(d);
       stepP(now);
       if (renderer && m !== 'off') {
-        renderer.draw(buildFrame({ d, width: innerWidth, height: innerHeight, timeMs: animate ? now : 0, motion: animate ? 'full' : 'reduced', presence: presenceProgress(presence, now) }));
+        renderer.draw(buildFrame({ d, width: innerWidth, height: innerHeight, timeMs: animate ? now : 0, motion: animate ? 'full' : 'reduced', presence: presenceProgress(presence, now), scrollY: animate ? scrollY : 0 }));
       }
       if (animate) schedule();
     }
