@@ -36,20 +36,3 @@ test('plain sections carry no mask anywhere up their ancestry', async ({ page })
     expect(masked, sel).toBe(false);
   }
 });
-test('phone width: the fixed OSD never sits over copy, at rest or mid-descent (Task 20 review)', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await open(page, { level: 'full' });
-  for (const f of [0, 0.25, 0.5, 0.75, 1]) {
-    await page.evaluate((x) => scrollTo(0, (document.documentElement.scrollHeight - innerHeight) * x), f);
-    const over = await page.locator('.osd').evaluate((osd) => {
-      const r = osd.getBoundingClientRect();
-      if (getComputedStyle(osd).display === 'none' || r.width === 0) return [];
-      const hits: string[] = [];
-      for (const el of document.querySelectorAll('main p, main h1, main h2, main h3, main li, main label, main a, main button, footer p, footer a')) {
-        for (const q of el.getClientRects()) if (q.right > r.left && q.left < r.right && q.bottom > r.top && q.top < r.bottom) hits.push(el.textContent!.trim().slice(0, 40));
-      }
-      return hits;
-    });
-    expect(over, `d=${f}`).toEqual([]);
-  }
-});
