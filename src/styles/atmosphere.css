@@ -27,6 +27,33 @@ html[data-field="webgl"] .field-static { display: none; }
 .shaft--s2 { left: calc(6% - 336px); top: -240px; width: 673px; height: 1150px; opacity: 0.14; transform: rotate(-21deg); }
 .shaft--s5 { left: calc(30% - 182px); top: -240px; width: 365px; height: 1350px; opacity: 0.075; transform: rotate(-7deg); }
 
+/* Static parallax (atmosphere-layers spec, Part 2). Where scroll timelines exist, the static field
+   is fixed to the screen, like the WebGL canvas: the shafts fade out over the first 15% of the page
+   (as the WebGL shafts dim with depth; a fade, not motion, so it runs at every level), and the
+   volumes drift up 800px over the whole page at full motion only. Without scroll timelines the
+   static field scrolls with the page, as before. The animation shorthand resets the timeline, so
+   animation-timeline must follow it, and in its own rule (same specificity, later): in one rule,
+   the build minifier folds it into the shorthand, which Chrome rejects whole. */
+@supports (animation-timeline: scroll()) {
+  .field-static { position: fixed; }
+  .field-static .shaft { animation: dw-shaft-fade linear both; animation-range: 0% 15%; }
+  .field-static > .shaft { animation-timeline: scroll(root); }
+  .field-static .volumes--page {
+    bottom: auto; height: calc(100vh + 800px);
+    background:
+      radial-gradient(1100px 760px at 86% 3%, rgba(30, 25, 40, 0.55), transparent 70%),
+      radial-gradient(1500px 1000px at 16% 40%, rgba(8, 7, 11, 0.42), transparent 72%),
+      radial-gradient(2000px 1400px at 90% 70%, rgba(28, 23, 37, 0.42), transparent 72%),
+      radial-gradient(2600px 1800px at 30% 100%, rgba(5, 4, 8, 0.6), transparent 72%);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html[data-atmosphere="full"]:not([data-atmosphere-held]) .field-static .volumes--page { animation: dw-drift linear both; }
+    html[data-atmosphere="full"]:not([data-atmosphere-held]) .field-static > .volumes--page { animation-timeline: scroll(root); }
+  }
+}
+@keyframes dw-shaft-fade { to { opacity: 0; } }
+@keyframes dw-drift { to { transform: translateY(-800px); } }
+
 /* WebGL canvas: fixed, behind everything, fades in after first paint. */
 .field { position: fixed; inset: 0; width: 100%; height: 100%; z-index: -4; pointer-events: none; opacity: 0; transition: opacity 600ms var(--ease); }
 html[data-field="webgl"] .field { opacity: 1; }

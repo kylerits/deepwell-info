@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { Window } from 'happy-dom';
 import { expect, test } from 'vitest';
 
@@ -39,4 +39,9 @@ test('every text block on the glass carries .smudge', () => {
     expect(els.length, sel).toBeGreaterThan(0);
     for (const el of els) expect(el.classList.contains('smudge'), sel).toBe(true);
   }
+});
+test('the minifier never folds a scroll timeline into the animation shorthand (Chrome drops it)', () => {
+  const css = readdirSync('dist-pilot/_astro').filter((n) => n.endsWith('.css')).map((n) => readFileSync(`dist-pilot/_astro/${n}`, 'utf8')).join('\n');
+  expect(css).toContain('animation-timeline:scroll(root)');
+  expect(css).not.toMatch(/animation:[^;}]*scroll\(/);
 });
