@@ -9,7 +9,7 @@ const links = [
 ].filter(Boolean) as { label: string; href: string }[];
 ---
 <footer class="foot-sec" data-depth="1">
-  <div class="wrap foot">
+  <div class="wrap foot smudge">
     <Logo />
     <nav aria-label="Footer"><ul class="foot__links">{links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}</ul></nav>
     <p class="foot__disc">An unofficial reader for the SCP Wiki. Not affiliated with or endorsed by the SCP Wiki.</p>

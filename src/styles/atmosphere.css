@@ -51,6 +51,38 @@ html[data-atmosphere="off"] .field { display: none; }
   position: fixed; inset: 0; z-index: -1; pointer-events: none;
   background: radial-gradient(ellipse 120% 96% at 56% 46%, transparent 58%, rgba(4, 3, 7, 0.5) 100%);
 }
+/* Smudges: grime on the glass behind each block of text (atmosphere-layers spec, Part 1; the
+   lit-void CRT stack's "Grime" layer). The ::before joins .dw's stacking context at z -1, after
+   the tube in DOM order, so its backdrop is the glass, vignette and field. A .smudge must never
+   create a stacking context (z-index, opacity, filter, isolation, transform, mask), or it becomes
+   a backdrop root and the blur sees nothing. The smudge is behind the text, never an ancestor of
+   it, and its edges dissolve: no border, radius or shadow. */
+.smudge { position: relative; }
+.smudge::before {
+  content: ""; position: absolute; z-index: -1; pointer-events: none;
+  inset: -120px -160px;
+  background: rgba(13, 11, 18, 0.28);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  -webkit-mask-image:
+    linear-gradient(to right, transparent, #000 160px, #000 calc(100% - 160px), transparent),
+    linear-gradient(to bottom, transparent, #000 120px, #000 calc(100% - 120px), transparent);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent, #000 160px, #000 calc(100% - 160px), transparent),
+    linear-gradient(to bottom, transparent, #000 120px, #000 calc(100% - 120px), transparent);
+  mask-composite: intersect;
+}
+/* .foot spans the whole container; its text sits at the left. */
+.foot.smudge::before { right: auto; width: min(calc(100% + 320px), 1000px); }
+/* Fallbacks: the text never depends on the effect. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .smudge::before { background: rgba(13, 11, 18, 0.85); }
+}
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  .smudge::before { background: rgba(13, 11, 18, 0.92); -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+@media (forced-colors: active), (max-width: 900px) { .smudge::before { display: none; } }
+html[data-atmosphere="off"] .smudge::before { display: none; }
 /* The OSD lives in the left gutter, outside the content column, so reading text never scrolls
    under it (Task 20 review). One line of it (~270px) is wider than any gutter (--gut ≤ 128px), so
    it runs vertically, reading bottom-to-top like a tape spine: same text, size, tracking and alpha. */

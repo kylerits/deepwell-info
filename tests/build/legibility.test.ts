@@ -29,3 +29,14 @@ test('the atmosphere switch is a labelled group of three pressed-state buttons',
   expect([...g.querySelectorAll('button')].map((b) => b.textContent!.trim())).toEqual(['Full', 'Reduced', 'Off']);
   for (const b of g.querySelectorAll('button')) expect(b.hasAttribute('aria-pressed')).toBe(true);
 });
+// Spec Part 1, Smudges table: every block of text that sits on the glass opts in.
+const SMUDGED = ['.top__logo', '#top .col', '#top .hero__visual', '.sec--trust .trust', '#problem .col',
+  '#module-01 .col', '#module-02 .col', '#module-03 .col', '#themes .col', '#themes .themes',
+  '#pricing .col', '#pricing .price', '#pricing .fine', '#licensing .col', '#faq > .wrap', '#start .col', '.foot'];
+test('every text block on the glass carries .smudge', () => {
+  for (const sel of SMUDGED) {
+    const els = [...d.querySelectorAll(sel)];
+    expect(els.length, sel).toBeGreaterThan(0);
+    for (const el of els) expect(el.classList.contains('smudge'), sel).toBe(true);
+  }
+});
