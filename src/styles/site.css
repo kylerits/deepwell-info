@@ -206,7 +206,7 @@ body { margin: 0; }
 .plist svg { flex: none; margin-top: 3px; color: var(--ink-soft); }
 .fine { font: 400 16px/1.6 var(--f-ui); color: var(--ink); max-width: 40em; margin: 64px 0 0; }
 
-/* Licensing: out of character. No tube, no light band. */
+/* Licensing: out of character. No light band. */
 .lic__body { font: 400 18px/1.65 var(--f-ui); color: var(--ink); max-width: 36em; margin: 0; }
 .lic__body strong { font-weight: 600; }
 .lic__small { font: 400 13.5px/1.6 var(--f-ui); color: var(--ink-soft); max-width: 48em; margin: 28px 0 0; }
@@ -239,7 +239,7 @@ body { margin: 0; }
 }
 html:not([data-js]) .atmo { display: none; }   /* the atmosphere switch needs JS */
 
-/* Phone (the .tube--side rule and the .osd rule move to atmosphere.css in Task 17) */
+/* Phone */
 @media (max-width: 900px) {
   .price__col { padding-right: 0; }
   .price__col + .price__col { border-left: 0; padding-left: 0; border-top: 1px solid var(--line); margin-top: 40px; padding-top: 40px; }

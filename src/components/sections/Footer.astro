@@ -9,7 +9,6 @@ const links = [
 ].filter(Boolean) as { label: string; href: string }[];
 ---
 <footer class="foot-sec" data-depth="1">
-  <div class="tube tube--edge" aria-hidden="true"></div>
   <div class="wrap foot">
     <Logo />
     <nav aria-label="Footer"><ul class="foot__links">{links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}</ul></nav>

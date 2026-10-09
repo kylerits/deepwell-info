@@ -32,8 +32,11 @@ html[data-field="webgl"] .field-static { display: none; }
 html[data-field="webgl"] .field { opacity: 1; }
 html[data-atmosphere="off"] .field { display: none; }
 
+/* The glass: one fixed layer over the whole screen (atmosphere-layers spec, Part 1). It has no
+   mask, so nothing can seam between sections; text that sits on it is smudged (see .smudge). It
+   follows the vignette in DOM order, so at the same z it paints above it, as the old tubes did. */
 .tube {
-  position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  position: fixed; inset: 0; z-index: -1; pointer-events: none;
   background-image:
     repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.34) 0 1px, rgba(0, 0, 0, 0) 1px 2px),
     repeating-linear-gradient(to right, rgba(255, 80, 80, 0.03) 0 1px, rgba(80, 255, 140, 0.025) 1px 2px, rgba(90, 140, 255, 0.03) 2px 3px);
@@ -43,18 +46,6 @@ html[data-atmosphere="off"] .field { display: none; }
   background-image: url(/atmos/grain.png);
   background-size: 192px 192px;
   opacity: 0.6;
-}
-.tube--side {
-  -webkit-mask-image: linear-gradient(90deg, transparent calc(var(--gut) + 700px), #000 calc(var(--gut) + 900px));
-  mask-image: linear-gradient(90deg, transparent calc(var(--gut) + 700px), #000 calc(var(--gut) + 900px));
-}
-.tube--edge {
-  -webkit-mask-image:
-    linear-gradient(to bottom, #000 0, transparent 64px, transparent calc(100% - 64px), #000 100%),
-    linear-gradient(90deg, transparent calc(var(--gut) + 1180px), #000 calc(var(--gut) + 1240px));
-  mask-image:
-    linear-gradient(to bottom, #000 0, transparent 64px, transparent calc(100% - 64px), #000 100%),
-    linear-gradient(90deg, transparent calc(var(--gut) + 1180px), #000 calc(var(--gut) + 1240px));
 }
 .vignette {
   position: fixed; inset: 0; z-index: -1; pointer-events: none;
@@ -70,10 +61,8 @@ html[data-atmosphere="off"] .field { display: none; }
   color: rgba(234, 223, 198, 0.58); white-space: pre;
 }
 
-@media (max-width: 900px) {
-  .tube--side { -webkit-mask-image: linear-gradient(to bottom, #000 0, transparent 64px, transparent calc(100% - 64px), #000 100%);
-                mask-image: linear-gradient(to bottom, #000 0, transparent 64px, transparent calc(100% - 64px), #000 100%); }
-}
+/* At 900px and below the copy spans the full width, so the glass is hidden (spec decision 3). */
+@media (max-width: 900px) { .tube { display: none; } }
 /* Phones: the copy spans the full width, so a fixed bottom-left OSD always lands on a line of it
    (at rest it covered the hero's "Free to read…" line). Reading text never sits under an overlay,
    so the OSD is hidden here, as the app hides it where its reader HUD owns the corner. Task 20. */

@@ -11,8 +11,13 @@ test('plain sections, summaries, CTAs and attribution never carry a recede ramp'
     expect(el.querySelector('.recede, .recede-h, .recede-slow'), sel).toBeNull();
   }
 });
-test('licensing is a frame-break: no tube at all', () => {
-  expect(d.querySelector('#licensing .tube')).toBeNull();
+test('one glass layer: a single .tube, a direct child of main.dw, none inside sections', () => {
+  const tubes = [...d.querySelectorAll('.tube')];
+  expect(tubes).toHaveLength(1);
+  expect(tubes[0]!.parentElement!.matches('main.dw')).toBe(true);
+  expect(tubes[0]!.getAttribute('aria-hidden')).toBe('true');
+  expect(d.querySelector('section .tube, footer .tube')).toBeNull();
+  expect(d.querySelector('.tube--side, .tube--edge')).toBeNull();
 });
 test('OSD is decorative, starts at the top timecode', () => {
   const osd = d.querySelector('.osd')!;
