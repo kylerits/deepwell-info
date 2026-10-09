@@ -70,7 +70,10 @@ html[data-atmosphere="off"] .field { display: none; }
   .tube--side { -webkit-mask-image: linear-gradient(to bottom, #000 0, transparent 64px, transparent calc(100% - 64px), #000 100%);
                 mask-image: linear-gradient(to bottom, #000 0, transparent 64px, transparent calc(100% - 64px), #000 100%); }
 }
-@media (max-width: 560px) { .osd { font-size: 11px; left: 16px; bottom: 14px; } }
+/* Phones: the copy spans the full width, so a fixed bottom-left OSD always lands on a line of it
+   (at rest it covered the hero's "Free to read…" line). Reading text never sits under an overlay,
+   so the OSD is hidden here, as the app hides it where its reader HUD owns the corner. Task 20. */
+@media (max-width: 560px) { .osd { display: none; } }
 
 /* Levels (handoff §4 "levels as prototyped"; the spec governs). */
 html[data-atmosphere="full"] .tube::after { animation: dw-grain 1.1s steps(5) infinite; }
