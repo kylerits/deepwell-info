@@ -5,7 +5,7 @@
   import { approach, depthAt, normalizeAnchors, type Anchor } from '../lib/field/depth';
   import { timecodeAt } from '../lib/field/field-params';
   import { PRESENCE, initialPresence, presenceProgress, stepPresence, type PresenceState } from '../lib/field/presence';
-  import { createHoldGate, wireHoldSources } from '../lib/atmosphere/hold';
+  import { pageHold } from '../lib/atmosphere/page-hold';
   import { effectiveMotion, isLevel, type AtmosphereLevel } from '../lib/atmosphere/level';
 
   let canvas: HTMLCanvasElement;
@@ -27,9 +27,9 @@
 
     const motion = (): 'full' | 'reduced' | 'off' => (level === 'off' ? 'off' : effectiveMotion(level, rm.matches));
     /** Continuous animation only at full, with a live renderer, and while nothing holds the atmosphere. */
-    const live = (): boolean => motion() === 'full' && renderer !== null && !gate.isHeld();
-    const gate = createHoldGate(root, (held) => { if (!held) schedule(); });
-    const unwire = wireHoldSources(gate, { doc: document, nav: navigator });
+    const live = (): boolean => motion() === 'full' && renderer !== null && !hold.isHeld();
+    const hold = pageHold();
+    const unsubHold = hold.subscribe((held) => { if (!held) schedule(); });
 
     function setField(): void { root.dataset.field = renderer ? 'webgl' : 'static'; }
     function ensureRenderer(): void {
@@ -49,7 +49,7 @@
       if (osd && t !== osdText) { osdText = t; osd.textContent = t; }
     }
     function stepP(now: number): void {
-      if (!renderer || gate.isHeld()) return; // nothing drawn, or held: never arm or run the presence
+      if (!renderer || hold.isHeld()) return; // nothing drawn, or held: never arm or run the presence
       const before = presence.phase;
       presence = stepPresence(presence, { now, d, motion: motion(), lastInputAt });
       if (before !== 'running' && presence.phase === 'running') markSeen();
@@ -100,7 +100,7 @@
     ensureRenderer(); measure(); d = depthAt(scrollY, anchors); schedule();
 
     return () => {
-      cancelAnimationFrame(raf); clearTimeout(settle); ro.disconnect(); unwire();
+      cancelAnimationFrame(raf); clearTimeout(settle); ro.disconnect(); unsubHold();
       removeEventListener('scroll', onInput);
       for (const t of ['pointermove', 'keydown', 'wheel', 'touchstart']) removeEventListener(t, onInput);
       removeEventListener('resize', onResize); removeEventListener('dw:atmosphere', onLevel);
