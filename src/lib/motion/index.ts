@@ -53,7 +53,7 @@ function build(m: MotionMode, initial: boolean): void {
     if (s.dataset.scene === 'hero') {
       const e = createEntrance(s, look(m));        // hides with inline styles first…
       root.removeAttribute('data-motion-arm');     // …so lifting the CSS pre-hide shows nothing
-      if (initial) { running.set(s, e); e.play(() => { running.delete(s); done(s); }); } else { e.settle(); done(s); }
+      if (initial && !hold.isHeld()) { running.set(s, e); e.play(() => { running.delete(s); done(s); }); } else { e.settle(); done(s); }
       continue;
     }
     if (initial && s.getBoundingClientRect().top < innerHeight) { done(s); continue; } // on screen, or above it
@@ -86,10 +86,19 @@ function rebuild(): void {
   keepPlace(() => { mode = next; root.dataset.motion = mode; build(mode, false); });
 }
 
+/** Held (tab hidden, battery saver): finish what is running; due entrances settle in trigger(). */
+function onHeld(): void {
+  for (const [s, e] of running) { e.settle(); done(s); }
+  running.clear();
+}
+/** Released: nothing to restart yet (Lenis and scrubs hook in here in Tasks 6-7). */
+function onReleased(): void {}
+
 export function startMotion(): void {
   const fonts = Promise.race([document.fonts?.ready ?? Promise.resolve(), new Promise((r) => setTimeout(r, 800))]);
   void fonts.then(() => {
     keepPlace(() => { mode = currentMode(); root.dataset.motion = mode; build(mode, true); });
+    hold.subscribe((held) => (held ? onHeld() : onReleased()));
     addEventListener('focusin', (ev) => {
       const s = (ev.target as Element | null)?.closest<HTMLElement>('[data-scene]');
       if (!s) return;
