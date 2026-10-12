@@ -10,7 +10,9 @@ export function snapshot(els: Iterable<Element>, o: { html?: boolean } = {}): Sn
     restore() {
       for (const s of saved) {
         if (s.html !== null && s.el.innerHTML !== s.html) s.el.innerHTML = s.html;
-        if (s.style === null) s.el.removeAttribute('style'); else s.el.setAttribute('style', s.style);
+        // Chromium serialises a lazily-synced inline style as style="" if the attribute is removed while the
+        // CSSOM is dirty; reading the attribute first forces the sync so the removal is clean.
+        if (s.style === null) { s.el.getAttribute('style'); s.el.removeAttribute('style'); } else s.el.setAttribute('style', s.style);
       }
     },
   };

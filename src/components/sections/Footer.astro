@@ -8,7 +8,7 @@ const links = [
   INSTAGRAM_URL && { label: 'Instagram', href: INSTAGRAM_URL }, { label: 'Contact', href: `mailto:${CONTACT_EMAIL}` },
 ].filter(Boolean) as { label: string; href: string }[];
 ---
-<footer class="foot-sec" data-depth="1">
+<footer class="foot-sec" data-depth="1" data-scene="footer">
   <div class="wrap foot smudge">
     <Logo />
     <nav aria-label="Footer"><ul class="foot__links">{links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}</ul></nav>

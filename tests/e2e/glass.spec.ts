@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { open, scrollToFraction } from './helpers';
+import { backdropRoots, open, scrollToFraction, settled } from './helpers';
 // State-independent, so pilot only, except coverage: the hero and final CTA differ between states.
 test.beforeEach(({}, info) => test.skip(info.project.name !== 'pilot' && !info.title.startsWith('coverage'), 'state-independent'));
 // The GPU compositor under SwiftShader re-blurs every smudge per frame, so a screenshot takes 2–30 s;
@@ -58,18 +58,7 @@ test('mechanics: no .smudge creates a stacking context, so every blur sees the g
   }).filter(Boolean));
   expect(bad).toEqual([]);
   // A backdrop root anywhere from the smudge up to <html> also cuts the blur off from the glass.
-  const roots = await page.evaluate(() => [...document.querySelectorAll('.smudge')].flatMap((smudge) => {
-    const hits: string[] = [];
-    for (let el: Element | null = smudge; el; el = el.parentElement) {
-      const s = getComputedStyle(el);
-      const ok = s.opacity === '1' && s.filter === 'none' && s.maskImage === 'none' && s.clipPath === 'none'
-        && s.backdropFilter === 'none' && s.mixBlendMode === 'normal'
-        && !/opacity|filter|mask|clip-path|mix-blend-mode/.test(s.willChange);
-      if (!ok) hits.push(`${smudge.className} ← ${el.tagName.toLowerCase()}.${el.className}`);
-    }
-    return hits;
-  }));
-  expect(roots).toEqual([]);
+  expect(await backdropRoots(page)).toEqual([]);
 });
 test('fallbacks: forced colours hide the smudge; more contrast drops the blur and darkens the tint', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -102,6 +91,7 @@ test('contrast: text holds its floors over the brightest backdrop in every secti
   for (const sel of ['#top', '.sec--trust', '#problem', '#module-01', '#module-02', '#module-03', '#themes', '#pricing', '#licensing', '#faq', '#start', 'footer']) {
     await page.evaluate((s) => { const el = document.querySelector(s)!; scrollTo(0, el.getBoundingClientRect().top + scrollY - 120); }, sel);
     await page.waitForTimeout(900);
+    await settled(page);
     const boxes = await page.evaluate(([s, surfaces]) => [...document.querySelector(s)!.querySelectorAll('p, h1, h2, h3, li')]
       .filter((e) => !e.closest(surfaces)).map((e) => e.getBoundingClientRect())
       .filter((r) => r.width > 0 && r.bottom > 0 && r.top < innerHeight)

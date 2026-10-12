@@ -15,8 +15,9 @@ import Licensing from '../components/sections/Licensing.astro';
 import Faq from '../components/sections/Faq.astro';
 import FinalCta from '../components/sections/FinalCta.astro';
 import Footer from '../components/sections/Footer.astro';
+import '../styles/motion.css';
 ---
-<Base coverSlugs={COVER_SLUGS}>
+<Base coverSlugs={COVER_SLUGS} motion>
   <main class="dw">
     <FieldStatic descent />
     <Field client:idle />
@@ -25,3 +26,7 @@ import Footer from '../components/sections/Footer.astro';
     <div class="osd" aria-hidden="true">▶ SP <span data-osd-time>00:14:07</span>   TRACKING ──┼──</div>
   </main>
 </Base>
+<script>
+  import { startMotion } from '../lib/motion';
+  startMotion();
+</script>
