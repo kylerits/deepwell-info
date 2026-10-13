@@ -15,6 +15,17 @@ function ownAnchorClicks(ev: MouseEvent): void {
   if (!a || !hash || a.target || a.hasAttribute('download')) return;
   ev.preventDefault();
   if (location.hash !== hash) history.pushState(null, '', hash);
+  moveFocus(hash);
+}
+
+/** The cancelled fragment navigation also skipped moving the sequential-focus start and the screen-reader position
+    to the target, so do it by hand. Sections get tabindex="-1" only if they have none (no ring: see site.css). */
+function moveFocus(hash: string): void {
+  let target: HTMLElement | null = null;
+  try { target = document.getElementById(decodeURIComponent(hash.slice(1))); } catch { return; }
+  if (!target) return;
+  if (!target.hasAttribute('tabindex') && !target.matches('a[href], button, input, select, textarea, [contenteditable]')) target.setAttribute('tabindex', '-1');
+  target.focus({ preventScroll: true });
 }
 
 export function startSmooth(): () => void {

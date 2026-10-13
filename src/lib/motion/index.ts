@@ -65,6 +65,7 @@ function arm(section: HTMLElement, m: MotionMode, { scene, inst }: Mounted): voi
 /** Switch to mode `m`. `keep` re-pins the reader's place: the mode (the Themes pin's height) and the scenes'
     own fit decisions both change the layout, so every "is it on screen" test below waits until it has run. */
 function build(m: MotionMode, initial: boolean, keep: () => void): void {
+  const armed = root.hasAttribute('data-motion-arm'); // read before anything lifts it: false means the 2 s fail-open already showed the hero
   mode = m; root.dataset.motion = m;
   const sections = [...document.querySelectorAll<HTMLElement>('[data-scene]')];
   if (m === 'none') { for (const s of sections) done(s); root.removeAttribute('data-motion-arm'); keep(); return; }
@@ -82,7 +83,10 @@ function build(m: MotionMode, initial: boolean, keep: () => void): void {
     if (s.dataset.scene === 'hero') {
       const e = createEntrance(s, look(m));        // hides with inline styles first…
       root.removeAttribute('data-motion-arm');     // …so lifting the CSS pre-hide shows nothing
-      if (initial && !hold.isHeld()) { running.set(s, e); e.play(() => { running.delete(s); done(s); }); } else { e.settle(); done(s); }
+      // Play only if the hero is still hidden by the pre-hide (F1) and nobody has focused into it yet (F2):
+      // otherwise it is already on screen (or in use), and hiding it to fade it in again would blink it out.
+      const used = s.contains(document.activeElement);
+      if (initial && armed && !used && !hold.isHeld()) { running.set(s, e); e.play(() => { running.delete(s); done(s); }); } else { e.settle(); done(s); }
       continue;
     }
     if (initial && s.getBoundingClientRect().top < innerHeight) { done(s); continue; } // on screen, or above it

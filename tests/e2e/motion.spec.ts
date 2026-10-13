@@ -227,6 +227,21 @@ test('anchor links glide to their target (Review Focus 5)', async ({ page }) => 
   await expect(page.locator('#pricing')).toHaveAttribute('data-scene-done', '');
   expect(new URL(page.url()).hash).toBe('#pricing'); // Back and deep links keep working
 });
+test('keyboard-activated anchors move focus to the target (F3)', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await open(page);
+  await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+  await page.waitForTimeout(1500);
+  await page.locator('.foot__links a[href="#pricing"]').focus();
+  await page.keyboard.press('Enter');
+  await page.waitForTimeout(2500);
+  expect(await page.evaluate(() => document.activeElement?.closest('#pricing') !== null)).toBe(true);
+  expect(await page.locator('#pricing').evaluate((e) => getComputedStyle(e).outlineStyle)).toBe('none');
+  await page.locator('.top__logo').focus();
+  await page.keyboard.press('Enter');
+  await page.waitForTimeout(2500);
+  expect(await page.evaluate(() => document.activeElement?.closest('#top') !== null)).toBe(true);
+});
 test('the logo glides back to the top (Review Focus 5)', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await open(page);
@@ -393,4 +408,49 @@ test('themes: a resize that keeps the mode re-decides the pin (Review Focus 1)',
   await expect(themes).not.toHaveAttribute('data-pin', /.*/);
   expect(await page.locator('#themes .pin').evaluate((e) => getComputedStyle(e).position)).toBe('sticky');
   expect(await themes.evaluate((e) => e.getBoundingClientRect().height / innerHeight)).toBeGreaterThan(3 - 0.01);
+});
+
+/** Hold every app chunk for `ms`, so the motion module arrives late (after the 2 s fail-open when ms > 2000). */
+const delayChunks = (page: Page, ms: number) => page.route('**/_astro/*.js', async (r) => { await new Promise((res) => setTimeout(res, ms)); await r.continue(); });
+
+test('a motion script that arrives after the 2 s fail-open never blinks the hero out (F1)', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.addInitScript(() => {
+    const w = window as unknown as { __dips: string[] };
+    w.__dips = [];
+    const peak = new WeakMap<Element, number>(); // some shipped copy rests below 1 (.subtitle 0.92): a dip is a drop from what was seen
+    const f = () => {
+      for (const e of document.querySelectorAll<HTMLElement>('#top .col > :not(h1), #top .col > :not(h1) *, #top .hero__visual > *')) {
+        const o = Number(getComputedStyle(e).opacity), p = peak.get(e) ?? 0;
+        if (o >= 0.5 && o > p) peak.set(e, o);
+        else if (p >= 0.5 && o < p - 0.05) w.__dips.push(`${e.tagName}.${e.className}=${o}`);
+      }
+      requestAnimationFrame(f);
+    };
+    requestAnimationFrame(f); // module scripts hold DOMContentLoaded, so start at once
+  });
+  await delayChunks(page, 2600);
+  await page.goto('/');
+  await expect(page.locator('html')).toHaveAttribute('data-motion', 'full', { timeout: 20_000 });
+  await page.waitForTimeout(2500);
+  expect(await page.evaluate(() => (window as unknown as { __dips: string[] }).__dips)).toEqual([]);
+  await expect(page.locator('#top')).toHaveAttribute('data-scene-done', '');
+});
+
+test('focus in the hero before motion starts is never faded in (F2)', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await delayChunks(page, 1200); // stays inside the 2 s arm
+  await page.goto('/', { waitUntil: 'commit' }); // module scripts hold DOMContentLoaded, so don't wait for it
+  const target = page.locator('#top .col input, #top .col a, #top .col button').first();
+  await target.waitFor({ state: 'attached' });
+  await target.evaluate((el) => (el as HTMLElement).focus());
+  expect(await page.locator('html').getAttribute('data-motion')).toBeNull();
+  await expect(page.locator('html')).toHaveAttribute('data-motion', 'full', { timeout: 20_000 });
+  const ops = await target.evaluate((el) => new Promise<number[]>((res) => {
+    const out: number[] = []; let n = 0;
+    const f = () => { let o = 1; for (let e: Element | null = el; e; e = e.parentElement) o *= Number(getComputedStyle(e).opacity); out.push(o); if (++n < 90) requestAnimationFrame(f); else res(out); };
+    f();
+  }));
+  expect(Math.min(...ops)).toBe(1);
+  expect(await target.evaluate((el) => el === document.activeElement)).toBe(true);
 });
