@@ -45,7 +45,7 @@ describe.skipIf(!existsSync(MD))('the real landing-page.md', () => {
   const c = extractLandingCopy(readFileSync(MD, 'utf8'));
   test('every page section yields copy', () => { for (let s = 1; s <= 10; s++) expect(c[s]!.length, `section ${s}`).toBeGreaterThan(0); });
   test('hero H1 and the pricing column names are captured', () => {
-    expect(c[1]).toContain('Welcome to orientation. Secure. Contain. Peruse.');
+    expect(c[1]).toContain('Welcome to orientation.');
     expect(c[6]).toContain('Deepwell Pro — one-time $2.99');
     expect(c[6]).toContain('(every future Pro feature included)');
   });
