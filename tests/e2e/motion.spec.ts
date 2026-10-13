@@ -198,8 +198,8 @@ const glideFrom = (page: Page, link: string) => page.locator(link).evaluate((el)
 /** The glide is one steady approach: it never jumps to the target and gets pulled back (a native fragment jump). */
 const expectGlide = (ys: number[], from: number, to: number) => {
   const dir = Math.sign(to - from), jitter = 2;
-  expect(Math.abs(ys[0] - to)).toBeGreaterThan(Math.abs(from - to) * 0.3);        // not already at the target
-  for (let i = 1; i < ys.length; i++) expect((ys[i] - ys[i - 1]) * dir).toBeGreaterThanOrEqual(-jitter); // monotone
+  expect(Math.abs(ys[0]! - to)).toBeGreaterThan(Math.abs(from - to) * 0.3);        // not already at the target
+  for (let i = 1; i < ys.length; i++) expect((ys[i]! - ys[i - 1]!) * dir).toBeGreaterThanOrEqual(-jitter); // monotone
   expect(ys.some((y) => Math.abs(y - from) > 20 && Math.abs(y - to) > 20)).toBe(true);                   // intermediates
   expect(Math.abs(ys.at(-1)! - to)).toBeLessThan(4);
 };
