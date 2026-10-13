@@ -41,12 +41,17 @@ test('a section on screen at load is left alone (deep link)', async ({ page }) =
     (window as unknown as { __styled: string[] }).__styled = [];
     new MutationObserver((ms) => { for (const m of ms) if ((m.target as Element).closest?.('#pricing')) (window as unknown as { __styled: string[] }).__styled.push((m.target as Element).className); })
       .observe(document, { subtree: true, attributes: true, attributeFilter: ['style'] });
+    // No native scroll anchoring (Safari has none): placeAnchor() alone must hold the view when the pin adds height.
+    document.addEventListener('DOMContentLoaded', () => {
+      const st = document.createElement('style'); st.textContent = 'html, body { overflow-anchor: none !important; }'; document.head.append(st);
+    });
   });
   await page.goto('/#pricing');
   await expect(page.locator('#pricing')).toHaveAttribute('data-scene-done', '');
   await page.waitForTimeout(1500);
   expect(await page.evaluate(() => (window as unknown as { __styled: string[] }).__styled)).toEqual([]);
-  // The Themes pin (Task 8) adds 220vh above Pricing once motion starts; keepPlace() holds the view.
+  // The Themes pin (Task 8) adds 220vh above Pricing once motion starts; placeAnchor() holds the view.
+  expect(await page.locator('#themes').evaluate((e) => e.getBoundingClientRect().height / innerHeight)).toBeGreaterThan(3 - 0.01); // the pin really exists
   expect(Math.abs(await page.locator('#pricing').evaluate((e) => e.getBoundingClientRect().top))).toBeLessThan(4);
 });
 
@@ -276,7 +281,91 @@ test('module 02: arriving pulses the \u00b6 14 mark in lamp amber', async ({ pag
   await open(page);
   await scrollSectionTo(page, '#module-02', 0.75);
   await page.waitForTimeout(1200);
-  await scrollSectionTo(page, '#module-02', 0.2);
-  await page.waitForTimeout(450);
-  expect((await styleOf(page, '#module-02 .reader__mark')).attr).toMatch(/color/);
+  // Sample the computed color every frame across the pulse; some frame must be well toward lamp amber
+  // (#C98A3B, red 201) from the resting teal (red channel far lower).
+  const rest = await page.locator('#module-02 .reader__mark').evaluate((e) => Number(/\d+/.exec(getComputedStyle(e).color)![0]));
+  const peak = await page.evaluate(() => new Promise<number>((res) => {
+    const mark = document.querySelector('#module-02 .reader__mark')!;
+    const t0 = performance.now(); let max = 0;
+    const tick = () => {
+      max = Math.max(max, Number(/\d+/.exec(getComputedStyle(mark).color)![0]));
+      if (performance.now() - t0 > 1800) res(max); else requestAnimationFrame(tick);
+    };
+    const s = document.querySelector('#module-02')!;
+    scrollTo(0, s.getBoundingClientRect().top + scrollY - innerHeight * 0.2);
+    tick();
+  }));
+  expect(peak).toBeGreaterThan(rest + 40);
+  expect(peak).toBeGreaterThan(150);
+});
+
+const cardLefts = (page: Page) => page.locator('#themes .tcard').evaluateAll((cs) => cs.map((c) => Math.round(c.getBoundingClientRect().left)));
+
+test('themes: pins, changes the lighting with the cards stacked, then deals them into the row', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await open(page);
+  const h = await page.locator('#themes').evaluate((e) => e.getBoundingClientRect().height / innerHeight);
+  expect(h).toBeGreaterThan(3 - 0.01);
+  await page.evaluate(() => { const s = document.querySelector('#themes')!; scrollTo(0, s.getBoundingClientRect().top + scrollY + innerHeight * 0.9); });
+  await page.waitForTimeout(1500);
+  expect(Math.round(await page.locator('#themes .pin').evaluate((e) => e.getBoundingClientRect().top))).toBe(0);
+  const stacked = await cardLefts(page);
+  expect(new Set(stacked).size).toBe(1);
+  expect(await backdropRoots(page)).toEqual([]);
+  await page.evaluate(() => { const s = document.querySelector('#themes')!; scrollTo(0, s.getBoundingClientRect().top + scrollY + innerHeight * 2.4); });
+  await page.waitForTimeout(1500);
+  expect(new Set(await cardLefts(page)).size).toBe(3);
+  expect(await page.locator('#themes .tcard[style]').count()).toBe(0);
+});
+test('themes: a pin taller than the screen is not pinned (Review Focus 1)', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 600 });
+  await open(page);
+  await expect(page.locator('#themes')).toHaveAttribute('data-pin', 'off');
+  const h = await page.locator('#themes').evaluate((e) => e.getBoundingClientRect().height / innerHeight);
+  expect(h).toBeLessThan(2);
+  expect(new Set(await cardLefts(page)).size).toBe(3); // the row, at rest
+  await scrollSectionTo(page, '#themes', 0.5); // the entrance still plays
+  await expect(page.locator('#themes')).toHaveAttribute('data-scene-done', '', { timeout: 10_000 });
+});
+test('themes: calm and narrow never pin', async ({ page }) => {
+  for (const [level, width] of [['reduced', 1440], ['full', 390]] as const) {
+    await page.setViewportSize({ width, height: 900 });
+    await open(page, { level });
+    expect(await page.locator('#themes .pin').evaluate((e) => getComputedStyle(e).position)).toBe('static');
+  }
+});
+test('a hold jumps every scrub to rest (final CTA, Module 02, Themes)', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await open(page);
+  try {
+    await scrollSectionTo(page, '#start', 0.85);
+    await page.waitForTimeout(1200);
+    expect((await styleOf(page, '.h-deep')).filter).toMatch(/blur/);
+    await scrollSectionTo(page, '#module-02', 0.75);
+    await page.waitForTimeout(1200);
+    expect(await page.locator('#module-02 .reader__prog i').getAttribute('style')).not.toBeNull();
+    await page.evaluate(() => { const s = document.querySelector('#themes')!; scrollTo(0, s.getBoundingClientRect().top + scrollY + innerHeight * 0.9); });
+    await page.waitForTimeout(1200);
+    expect(await page.locator('#themes .tcard[style]').count()).toBeGreaterThan(0);
+    await setHidden(page, true);
+    expect(await page.locator('#module-02 .reader__prog i').getAttribute('style')).toBeNull();
+    expect(await page.locator('#themes .tcard[style], #themes .tcard__label[style]').count()).toBe(0);
+    await scrollSectionTo(page, '#start', 0.85);
+    await page.waitForTimeout(600);
+    expect(await page.locator('.h-deep').getAttribute('style')).toBeNull();
+  } finally { await setHidden(page, false); }
+});
+
+test('final CTA: at max scroll on a 2x display the scrub still resolves to the shipped DOM (fractional max scroll)', async ({ browser }, info) => {
+  const ctx = await browser.newContext({ baseURL: info.project.use.baseURL, viewport: { width: 1440, height: 899 }, deviceScaleFactor: 2 });
+  const page = await ctx.newPage();
+  try {
+    await open(page);
+    await page.addStyleTag({ content: 'body { padding-bottom: 0.4px; }' }); // a fractional document height
+    await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+    await page.waitForTimeout(2000);
+    const gap = await page.evaluate(() => document.documentElement.scrollHeight - innerHeight - scrollY);
+    expect(gap).toBeGreaterThanOrEqual(0); // sanity: we are at the bottom, and may be a fraction short of the rounded max
+    expect(await page.locator('.h-deep').getAttribute('style')).toBeNull();
+  } finally { await ctx.close(); }
 });

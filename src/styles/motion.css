@@ -13,3 +13,13 @@ html[data-motion-arm] :is(#top .col > :not(h1), #top .hero__visual > *) { opacit
 .summary__label::after { transform: scaleX(var(--dw-rule, 1)); transform-origin: 0 50%; }
 /* Module 02's progress bar fills from its left edge. */
 .reader__prog i { transform-origin: 0 50%; }
+
+/* Themes pin (motion-scenes spec, Part 2): 100vh of sticky screen plus 220vh of scroll, at `full` on desktop
+   only, and only when the content fits the screen (the scene sets data-pin="off" otherwise). Sticky is not
+   a backdrop root, so the smudges inside keep their blur. */
+@media (min-width: 901px) {
+  html[data-motion="full"] .sec--pin:not([data-pin="off"]) { height: 320vh; padding-block: 0; }
+  html[data-motion="full"] .sec--pin:not([data-pin="off"]) > .pin {
+    position: sticky; top: 0; min-height: 100vh; display: grid; align-content: center; padding-block: 48px;
+  }
+}

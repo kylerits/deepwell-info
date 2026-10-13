@@ -4,6 +4,9 @@ import { expect, test } from 'vitest';
 const IDS = ['hero', 'trust', 'problem', 'module-01', 'module-02', 'module-03', 'themes', 'pricing', 'licensing', 'faq', 'final-cta', 'footer'];
 for (const out of ['dist-pilot', 'dist-public']) {
   const html = readFileSync(`${out}/index.html`, 'utf8');
+  test(`${out}: Themes carries its pin wrapper`, () => {
+    expect(html).toMatch(/<section[^>]*class="[^"]*\bsec--pin\b[^"]*"[^>]*id="themes"[\s\S]*?<div class="pin">\s*<div class="wrap">/);
+  });
   test(`${out}: every landing section is a scene, in page order`, () => {
     const roots = [...html.matchAll(/<(section|footer)\b[^>]*>/g)].map((m) => m[0]);
     expect(roots.every((r) => /\bdata-scene="/.test(r)), roots.join('\n')).toBe(true);

@@ -7,6 +7,11 @@ test('rangeProgress clamps to 0..1 and is linear inside', () => {
   expect(rangeProgress(200, r)).toBe(0.5);
   expect(rangeProgress(999, r)).toBe(1);
 });
+test('rangeProgress treats the last pixel as the end (a fractional max scroll still resolves)', () => {
+  const r = { start: 100, end: 300 };
+  expect(rangeProgress(299.4, r)).toBe(1);
+  expect(rangeProgress(298.5, r)).toBeLessThan(1);
+});
 test('a zero-length range is a step at start', () => {
   expect(rangeProgress(99, { start: 100, end: 100 })).toBe(0);
   expect(rangeProgress(100, { start: 100, end: 100 })).toBe(1);

@@ -1,7 +1,7 @@
 import type { Range } from '../progress';
 export interface SceneInstance {
   range(): Range;
-  /** quiet: the jump to rest comes from a hold or a rebuild, so one-shot beats stay silent. */
+  /** quiet: the jump to rest comes from a hold (the driver passes it on that path only), so one-shot beats stay silent. A rebuild is covered by each scene's own first-scrub guard. */
   scrub(p: number, quiet?: boolean): void;
   destroy(): void;
 }

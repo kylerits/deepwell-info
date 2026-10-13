@@ -33,7 +33,8 @@ function drive(): void {
   scenes.forEach((s, i) => s.scrub(held ? 1 : rangeProgress(scrollY, ranges[i]!), held));
 }
 const onScroll = (): void => { if (!raf) raf = requestAnimationFrame(drive); };
-function mountScene(s: HTMLElement, m: MotionMode): { scene?: Scene; inst: SceneInstance | null } {
+type Mounted = { scene?: Scene; inst: SceneInstance | null };
+function mountScene(s: HTMLElement, m: MotionMode): Mounted {
   const scene = m === 'full' ? SCENES[s.dataset.scene ?? ''] : undefined;
   const inst = scene?.mount(s) ?? null;
   if (inst) scenes.push(inst);
@@ -55,15 +56,19 @@ function sweep(): void {
   for (const s of [...pending.keys()]) if (s.getBoundingClientRect().bottom <= 0) trigger(s, true);
 }
 
-function arm(section: HTMLElement, m: MotionMode): void {
-  const { scene, inst } = mountScene(section, m); // mount first: the scene's elements are its own
+function arm(section: HTMLElement, m: MotionMode, { scene, inst }: Mounted): void { // the scene is mounted first: its elements are its own
   pending.set(section, createEntrance(section, look(m), inst && scene ? scene.owns : []));
   io?.observe(section);
 }
 
-function build(m: MotionMode, initial: boolean): void {
+/** Switch to mode `m`. `keep` re-pins the reader's place: the mode (the Themes pin's height) and the scenes'
+    own fit decisions both change the layout, so every "is it on screen" test below waits until it has run. */
+function build(m: MotionMode, initial: boolean, keep: () => void): void {
+  mode = m; root.dataset.motion = m;
   const sections = [...document.querySelectorAll<HTMLElement>('[data-scene]')];
-  if (m === 'none') { for (const s of sections) done(s); root.removeAttribute('data-motion-arm'); return; }
+  if (m === 'none') { for (const s of sections) done(s); root.removeAttribute('data-motion-arm'); keep(); return; }
+  const mounted = new Map(sections.map((s) => [s, mountScene(s, m)] as const)); // pass 1: layout settles
+  keep();
   io = new IntersectionObserver((entries) => {
     for (const en of entries) {
       const s = en.target as HTMLElement;
@@ -72,18 +77,19 @@ function build(m: MotionMode, initial: boolean): void {
     }
   }, { rootMargin: '0px 0px -20% 0px' });
   for (const s of sections) {
-    if (s.hasAttribute('data-scene-done')) { mountScene(s, m); continue; } // played already: scenes still scrub
+    if (s.hasAttribute('data-scene-done')) continue; // played already: scenes still scrub
     if (s.dataset.scene === 'hero') {
       const e = createEntrance(s, look(m));        // hides with inline styles first…
       root.removeAttribute('data-motion-arm');     // …so lifting the CSS pre-hide shows nothing
       if (initial && !hold.isHeld()) { running.set(s, e); e.play(() => { running.delete(s); done(s); }); } else { e.settle(); done(s); }
       continue;
     }
-    if (initial && s.getBoundingClientRect().top < innerHeight) { mountScene(s, m); done(s); continue; } // on screen, or above it
-    arm(s, m);
+    if (initial && s.getBoundingClientRect().top < innerHeight) { done(s); continue; } // on screen, or above it
+    arm(s, m, mounted.get(s)!);
   }
   if (scenes.length) { addEventListener('scroll', onScroll, { passive: true }); drive(); }
   if (m === 'full' && !hold.isHeld()) { endSmooth(); stopSmooth = startSmooth(); }
+  keep();
 }
 
 function teardown(): void {
@@ -91,6 +97,7 @@ function teardown(): void {
   removeEventListener('scroll', onScroll); cancelAnimationFrame(raf); raf = 0;
   for (const sc of scenes) sc.destroy();
   scenes = [];
+  for (const s of document.querySelectorAll('[data-pin]')) s.removeAttribute('data-pin'); // a scene that declined to pin leaves its mark
   io?.disconnect(); io = null;
   for (const [s, e] of running) { e.settle(); done(s); }
   running.clear();
@@ -98,21 +105,23 @@ function teardown(): void {
   pending.clear();
 }
 
-/** A mode change can add or remove height above the reader (the Themes pin, Task 8): keep whatever is at
-    the top of the screen where it is, so a deep link or a resize never jumps the page. */
-function keepPlace(fn: () => void): void {
+/** A mode change can add or remove height above the reader (the Themes pin, Task 8): note what is at the
+    top of the screen now; the returned function puts it back, so a deep link or a resize never jumps the page. */
+function placeAnchor(): () => void {
   const anchor = [...document.querySelectorAll<HTMLElement>('[data-scene]')].find((s) => s.getBoundingClientRect().bottom > 0);
   const before = anchor?.getBoundingClientRect().top ?? 0;
-  fn();
-  const shift = (anchor?.getBoundingClientRect().top ?? before) - before;
-  if (Math.abs(shift) > 1) scrollBy(0, shift);
+  return () => {
+    const shift = (anchor?.getBoundingClientRect().top ?? before) - before;
+    if (Math.abs(shift) > 1) scrollBy(0, shift);
+  };
 }
 
 function rebuild(): void {
   const next = currentMode();
   if (next === mode) return;
+  const keep = placeAnchor();
   teardown();
-  keepPlace(() => { mode = next; root.dataset.motion = mode; build(mode, false); });
+  build(next, false, keep);
 }
 
 /** Held (tab hidden, battery saver): finish what is running; due entrances settle in trigger(). */
@@ -128,7 +137,7 @@ function onReleased(): void { if (mode === 'full' && !stopSmooth) stopSmooth = s
 export function startMotion(): void {
   const fonts = Promise.race([document.fonts?.ready ?? Promise.resolve(), new Promise((r) => setTimeout(r, 800))]);
   void fonts.then(() => {
-    keepPlace(() => { mode = currentMode(); root.dataset.motion = mode; build(mode, true); });
+    build(currentMode(), true, placeAnchor());
     hold.subscribe((held) => (held ? onHeld() : onReleased()));
     addEventListener('focusin', (ev) => {
       const s = (ev.target as Element | null)?.closest<HTMLElement>('[data-scene]');

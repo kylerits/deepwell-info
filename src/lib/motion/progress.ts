@@ -3,6 +3,7 @@ export type Range = { start: number; end: number };
 
 export function rangeProgress(scrollY: number, r: Range): number {
   if (r.end <= r.start) return scrollY >= r.start ? 1 : 0;
+  if (scrollY >= r.end - 1) return 1; // the real max scroll can be fractional (2x DPR): the last pixel is the end
   const p = (scrollY - r.start) / (r.end - r.start);
   return p < 0 ? 0 : p > 1 ? 1 : p;
 }

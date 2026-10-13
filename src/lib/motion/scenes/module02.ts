@@ -22,6 +22,7 @@ export const module02: Scene = {
     let beat: JSAnimation[] = [];
     const stopBeat = (): void => { for (const a of beat) a.cancel(); beat = []; markSnap.restore(); glyphSnap.restore(); };
     const arrive = (): void => {
+      stopBeat(); // a quick second arrival must not read a half-amber color as rest, nor leak the old animations
       const rest = getComputedStyle(mark).color;
       const paths = createDrawable(glyph.querySelectorAll('path'));
       beat = [
