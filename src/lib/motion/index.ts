@@ -3,6 +3,8 @@
 import { isLevel, type AtmosphereLevel } from '../atmosphere/level';
 import { pageHold } from '../atmosphere/page-hold';
 import { motionMode, type MotionMode } from './mode';
+import { rangeProgress } from './progress';
+import { SCENES, type Scene, type SceneInstance } from './scenes';
 import { startSmooth } from './smooth';
 import { createEntrance, type Entrance, type Look } from './vocabulary';
 
@@ -20,6 +22,23 @@ const running = new Map<HTMLElement, Entrance>();
 const hold = pageHold();
 let stopSmooth: (() => void) | null = null;
 const endSmooth = (): void => { stopSmooth?.(); stopSmooth = null; };
+let scenes: SceneInstance[] = [];
+let raf = 0;
+
+/** Scrubs run at `full` only. Reads every range first, then writes every scrub; a hold jumps all to rest. */
+function drive(): void {
+  raf = 0;
+  const held = hold.isHeld();
+  const ranges = scenes.map((s) => s.range());
+  scenes.forEach((s, i) => s.scrub(held ? 1 : rangeProgress(scrollY, ranges[i]!), held));
+}
+const onScroll = (): void => { if (!raf) raf = requestAnimationFrame(drive); };
+function mountScene(s: HTMLElement, m: MotionMode): { scene?: Scene; inst: SceneInstance | null } {
+  const scene = m === 'full' ? SCENES[s.dataset.scene ?? ''] : undefined;
+  const inst = scene?.mount(s) ?? null;
+  if (inst) scenes.push(inst);
+  return { scene, inst };
+}
 
 function trigger(section: HTMLElement, instant: boolean): void {
   const e = pending.get(section);
@@ -37,7 +56,8 @@ function sweep(): void {
 }
 
 function arm(section: HTMLElement, m: MotionMode): void {
-  pending.set(section, createEntrance(section, look(m)));
+  const { scene, inst } = mountScene(section, m); // mount first: the scene's elements are its own
+  pending.set(section, createEntrance(section, look(m), inst && scene ? scene.owns : []));
   io?.observe(section);
 }
 
@@ -52,21 +72,25 @@ function build(m: MotionMode, initial: boolean): void {
     }
   }, { rootMargin: '0px 0px -20% 0px' });
   for (const s of sections) {
-    if (s.hasAttribute('data-scene-done')) continue;
+    if (s.hasAttribute('data-scene-done')) { mountScene(s, m); continue; } // played already: scenes still scrub
     if (s.dataset.scene === 'hero') {
       const e = createEntrance(s, look(m));        // hides with inline styles first…
       root.removeAttribute('data-motion-arm');     // …so lifting the CSS pre-hide shows nothing
       if (initial && !hold.isHeld()) { running.set(s, e); e.play(() => { running.delete(s); done(s); }); } else { e.settle(); done(s); }
       continue;
     }
-    if (initial && s.getBoundingClientRect().top < innerHeight) { done(s); continue; } // on screen, or above it
+    if (initial && s.getBoundingClientRect().top < innerHeight) { mountScene(s, m); done(s); continue; } // on screen, or above it
     arm(s, m);
   }
+  if (scenes.length) { addEventListener('scroll', onScroll, { passive: true }); drive(); }
   if (m === 'full' && !hold.isHeld()) { endSmooth(); stopSmooth = startSmooth(); }
 }
 
 function teardown(): void {
   endSmooth();
+  removeEventListener('scroll', onScroll); cancelAnimationFrame(raf); raf = 0;
+  for (const sc of scenes) sc.destroy();
+  scenes = [];
   io?.disconnect(); io = null;
   for (const [s, e] of running) { e.settle(); done(s); }
   running.clear();
@@ -96,9 +120,10 @@ function onHeld(): void {
   endSmooth();
   for (const [s, e] of running) { e.settle(); done(s); }
   running.clear();
+  drive(); // scrubs jump to rest
 }
-/** Released: smoothing comes back at full (scrubs hook in here in Task 7). */
-function onReleased(): void { if (mode === 'full' && !stopSmooth) stopSmooth = startSmooth(); }
+/** Released: smoothing comes back at full and scrubs resume from the live scroll position. */
+function onReleased(): void { if (mode === 'full' && !stopSmooth) stopSmooth = startSmooth(); drive(); }
 
 export function startMotion(): void {
   const fonts = Promise.race([document.fonts?.ready ?? Promise.resolve(), new Promise((r) => setTimeout(r, 800))]);
@@ -115,6 +140,6 @@ export function startMotion(): void {
     addEventListener('scroll', sweep, { passive: true });
     addEventListener('dw:atmosphere', rebuild);
     rm.addEventListener('change', rebuild);
-    addEventListener('resize', rebuild);
+    addEventListener('resize', () => { const before = mode; rebuild(); if (mode === before) onScroll(); }); // same mode: re-measure ranges
   });
 }

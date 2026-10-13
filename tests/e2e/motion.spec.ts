@@ -11,6 +11,7 @@ async function descend(page: Page) {
     await page.waitForTimeout(300);
   }
   await expect(page.locator('[data-scene]:not([data-scene-done])')).toHaveCount(0, { timeout: 20_000 });
+  await page.waitForTimeout(1500); // Module 02's arrival pulse restores its mark after data-scene-done is set
 }
 
 for (const [level, width, mode] of [['full', 1440, 'full'], ['full', 390, 'full-narrow'], ['reduced', 1440, 'calm']] as const)
@@ -75,6 +76,9 @@ test('a fling to the bottom leaves nothing hidden (Review Focus 2)', async ({ pa
   await page.keyboard.press('Home');
   await page.waitForTimeout(1500);
   await expect(page.locator('[data-scene]:not([data-scene-done])')).toHaveCount(0, { timeout: 20_000 });
+  // Scenes scrub with scroll: at the top the far ones sit at their start frame, so compare back at the bottom.
+  await page.keyboard.press('End');
+  await page.waitForTimeout(3000);
   expect(await restingDom(page)).toEqual(await baseline(browser, { width: 1440, height: 900 }));
 });
 
@@ -222,4 +226,57 @@ test('the logo glides back to the top (Review Focus 5)', async ({ page }) => {
   await page.waitForTimeout(1500);
   const from = await page.evaluate(() => scrollY);
   expectGlide(await glideFrom(page, '.top__logo'), from, 0);
+});
+
+const scrollSectionTo = (page: Page, sel: string, frac: number) => page.evaluate(([s, f]) => {
+  const el = document.querySelector(s as string)!; scrollTo(0, el.getBoundingClientRect().top + scrollY - innerHeight * (f as number));
+}, [sel, frac] as const);
+const styleOf = (page: Page, sel: string) => page.locator(sel).evaluate((e) => { const s = getComputedStyle(e); return { attr: e.getAttribute('style'), filter: s.filter, transform: s.transform, color: s.color }; });
+
+for (const size of [{ width: 1280, height: 720 }, { width: 1440, height: 900 }])
+  test(`final CTA: "Go deeper." is in focus at max scroll @${size.width}x${size.height}`, async ({ page }) => {
+    await page.setViewportSize(size);
+    await open(page);
+    await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+    await page.waitForTimeout(2000);
+    const s = await styleOf(page, '.h-deep');
+    expect(s).toMatchObject({ attr: null, filter: 'none', transform: 'none' });
+  });
+test('final CTA: on approach it is far off and out of focus; calm never blurs it', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await open(page);
+  await scrollSectionTo(page, '#start', 0.85);
+  await page.waitForTimeout(1200);
+  const far = await styleOf(page, '.h-deep');
+  expect(far.filter).toMatch(/blur/);
+  expect(far.transform).not.toBe('none');
+  await open(page, { level: 'reduced' });
+  await scrollSectionTo(page, '#start', 0.6);
+  await page.waitForTimeout(1500);
+  expect((await styleOf(page, '.h-deep')).filter).toBe('none');
+});
+test('module 02: the bar fills with scroll, rests at its shipped width, and runs back', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await open(page);
+  const scaleX = () => page.locator('#module-02 .reader__prog i').evaluate((e) => { const m = getComputedStyle(e).transform; return m === 'none' ? 1 : Number(m.slice(7).split(',')[0]); });
+  await scrollSectionTo(page, '#module-02', 0.75);
+  await page.waitForTimeout(1200);
+  const mid = await scaleX();
+  expect(mid).toBeGreaterThan(0); expect(mid).toBeLessThan(1);
+  await scrollSectionTo(page, '#module-02', 0.1);
+  await page.waitForTimeout(2500);
+  expect(await page.locator('#module-02 .reader__prog i').getAttribute('style')).toBeNull();
+  expect(await page.locator('#module-02 .reader__mark').getAttribute('style')).toBeNull();
+  await scrollSectionTo(page, '#module-02', 0.75);
+  await page.waitForTimeout(1200);
+  expect(await scaleX()).toBeLessThan(1);
+});
+test('module 02: arriving pulses the \u00b6 14 mark in lamp amber', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await open(page);
+  await scrollSectionTo(page, '#module-02', 0.75);
+  await page.waitForTimeout(1200);
+  await scrollSectionTo(page, '#module-02', 0.2);
+  await page.waitForTimeout(450);
+  expect((await styleOf(page, '#module-02 .reader__mark')).attr).toMatch(/color/);
 });
