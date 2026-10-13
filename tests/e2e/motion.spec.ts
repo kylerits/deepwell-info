@@ -148,3 +148,52 @@ test('crossing 900px mid-entrance rebuilds without stuck text (Review Focus 3)',
   await descend(page);
   expect(await restingDom(page)).toEqual(await baseline(browser, { width: 800, height: 900 }));
 });
+
+test('smooth scroll runs at full on desktop only', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await open(page);
+  await expect(page.locator('html')).toHaveClass(/\blenis\b/);
+  for (const [level, width] of [['reduced', 1440], ['off', 1440], ['full', 390]] as const) {
+    await page.setViewportSize({ width, height: 900 });
+    await open(page, { level });
+    await page.waitForTimeout(500);
+    await expect(page.locator('html')).not.toHaveClass(/\blenis\b/);
+  }
+});
+test('the wheel glides: scroll lags the input, then arrives', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await open(page);
+  // Timed inside the page, from the wheel event: Playwright's own round trips are far too slow and uneven in
+  // headless to time a 60 ms window. Lenis (lerp 0.07) takes ~380 ms to cover 80% of a throw; a native jump is one frame.
+  await page.evaluate(() => {
+    const w = window as unknown as { __wheel: number; __at80: number };
+    w.__wheel = 0; w.__at80 = 0;
+    addEventListener('wheel', () => { w.__wheel ||= performance.now(); }, { passive: true, once: true });
+    addEventListener('scroll', () => { if (w.__wheel && !w.__at80 && scrollY >= 480) w.__at80 = performance.now(); });
+  });
+  await page.mouse.move(700, 450);
+  await page.mouse.wheel(0, 600);
+  await expect.poll(() => page.evaluate(() => scrollY), { timeout: 20000 }).toBeGreaterThan(550);
+  const lag = await page.evaluate(() => { const w = window as unknown as { __wheel: number; __at80: number }; return w.__at80 - w.__wheel; });
+  expect(lag).toBeGreaterThan(200);
+});
+test('a hold hands scroll back to the browser, and release restores smoothing', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await open(page);
+  await setHidden(page, true);
+  await expect(page.locator('html')).not.toHaveClass(/\blenis\b/);
+  await setHidden(page, false);
+  await expect(page.locator('html')).toHaveClass(/\blenis\b/);
+});
+test('anchor links glide to their target (Review Focus 5)', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await open(page);
+  await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+  await page.waitForTimeout(800);
+  // el.click(), not Playwright's click(): its scroll-into-view nudges the page natively just before the click, and
+  // Lenis (which reads the next frame) would then aim from a stale position. A real reader does not do that.
+  await page.locator('.foot__links a[href="#pricing"]').evaluate((a) => (a as HTMLElement).click());
+  // The glide is frame-rate bound and headless WebGL runs few fps, so poll for arrival rather than sleep.
+  await expect.poll(() => page.locator('#pricing').evaluate((e) => Math.abs(e.getBoundingClientRect().top)), { timeout: 20000 }).toBeLessThan(4);
+  await expect(page.locator('#pricing')).toHaveAttribute('data-scene-done', '');
+});

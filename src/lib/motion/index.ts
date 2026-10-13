@@ -3,6 +3,7 @@
 import { isLevel, type AtmosphereLevel } from '../atmosphere/level';
 import { pageHold } from '../atmosphere/page-hold';
 import { motionMode, type MotionMode } from './mode';
+import { startSmooth } from './smooth';
 import { createEntrance, type Entrance, type Look } from './vocabulary';
 
 const root = document.documentElement;
@@ -17,6 +18,8 @@ let io: IntersectionObserver | null = null;
 const pending = new Map<HTMLElement, Entrance>();
 const running = new Map<HTMLElement, Entrance>();
 const hold = pageHold();
+let stopSmooth: (() => void) | null = null;
+const endSmooth = (): void => { stopSmooth?.(); stopSmooth = null; };
 
 function trigger(section: HTMLElement, instant: boolean): void {
   const e = pending.get(section);
@@ -59,9 +62,11 @@ function build(m: MotionMode, initial: boolean): void {
     if (initial && s.getBoundingClientRect().top < innerHeight) { done(s); continue; } // on screen, or above it
     arm(s, m);
   }
+  if (m === 'full' && !hold.isHeld()) { endSmooth(); stopSmooth = startSmooth(); }
 }
 
 function teardown(): void {
+  endSmooth();
   io?.disconnect(); io = null;
   for (const [s, e] of running) { e.settle(); done(s); }
   running.clear();
@@ -88,11 +93,12 @@ function rebuild(): void {
 
 /** Held (tab hidden, battery saver): finish what is running; due entrances settle in trigger(). */
 function onHeld(): void {
+  endSmooth();
   for (const [s, e] of running) { e.settle(); done(s); }
   running.clear();
 }
-/** Released: nothing to restart yet (Lenis and scrubs hook in here in Tasks 6-7). */
-function onReleased(): void {}
+/** Released: smoothing comes back at full (scrubs hook in here in Task 7). */
+function onReleased(): void { if (mode === 'full' && !stopSmooth) stopSmooth = startSmooth(); }
 
 export function startMotion(): void {
   const fonts = Promise.race([document.fonts?.ready ?? Promise.resolve(), new Promise((r) => setTimeout(r, 800))]);
