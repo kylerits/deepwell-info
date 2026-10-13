@@ -154,6 +154,9 @@ test('crossing 900px mid-entrance rebuilds without stuck text (Review Focus 3)',
   await page.waitForTimeout(300);
   await page.setViewportSize({ width: 800, height: 900 });
   await expect(page.locator('html')).toHaveAttribute('data-motion', 'full-narrow');
+  // restingDom strips data-pin, so assert the pin itself is gone (Review Focus 3)
+  expect(await page.locator('#themes').getAttribute('data-pin')).toBeNull();
+  expect(await page.locator('#themes .pin').evaluate((e) => getComputedStyle(e).position)).not.toBe('sticky');
   await descend(page);
   expect(await restingDom(page)).toEqual(await baseline(browser, { width: 800, height: 900 }));
 });
@@ -283,20 +286,27 @@ test('module 02: arriving pulses the \u00b6 14 mark in lamp amber', async ({ pag
   await page.waitForTimeout(1200);
   // Sample the computed color every frame across the pulse; some frame must be well toward lamp amber
   // (#C98A3B, red 201) from the resting teal (red channel far lower).
-  const rest = await page.locator('#module-02 .reader__mark').evaluate((e) => Number(/\d+/.exec(getComputedStyle(e).color)![0]));
-  const peak = await page.evaluate(() => new Promise<number>((res) => {
+  const AMBER = [201, 138, 59];
+  const dist = (c: number[]) => Math.hypot(c[0]! - AMBER[0]!, c[1]! - AMBER[1]!, c[2]! - AMBER[2]!);
+  const rgb = (c: string) => { const m = /^rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(c); if (!m) throw new Error(`not rgb(): ${c}`); return [+m[1]!, +m[2]!, +m[3]!]; };
+  const rest = dist(rgb(await page.locator('#module-02 .reader__mark').evaluate((e) => getComputedStyle(e).color)));
+  const best = await page.evaluate(() => new Promise<string>((res) => {
     const mark = document.querySelector('#module-02 .reader__mark')!;
-    const t0 = performance.now(); let max = 0;
+    const AMB = [201, 138, 59];
+    const t0 = performance.now(); let min = Infinity; let at = '';
     const tick = () => {
-      max = Math.max(max, Number(/\d+/.exec(getComputedStyle(mark).color)![0]));
-      if (performance.now() - t0 > 1800) res(max); else requestAnimationFrame(tick);
+      const c = getComputedStyle(mark).color; const m = /^rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(c);
+      if (!m) { res(`not rgb(): ${c}`); return; }
+      const d = Math.hypot(+m[1]! - AMB[0]!, +m[2]! - AMB[1]!, +m[3]! - AMB[2]!);
+      if (d < min) { min = d; at = c; }
+      if (performance.now() - t0 > 1800) res(at); else requestAnimationFrame(tick);
     };
     const s = document.querySelector('#module-02')!;
     scrollTo(0, s.getBoundingClientRect().top + scrollY - innerHeight * 0.2);
     tick();
   }));
-  expect(peak).toBeGreaterThan(rest + 40);
-  expect(peak).toBeGreaterThan(150);
+  expect(best, 'computed color must be rgb()').toMatch(/^rgba?\(/);
+  expect(dist(rgb(best))).toBeLessThan(rest / 2); // the peak frame is at least halfway home to lamp amber, never toward red
 });
 
 const cardLefts = (page: Page) => page.locator('#themes .tcard').evaluateAll((cs) => cs.map((c) => Math.round(c.getBoundingClientRect().left)));
@@ -356,7 +366,7 @@ test('a hold jumps every scrub to rest (final CTA, Module 02, Themes)', async ({
   } finally { await setHidden(page, false); }
 });
 
-test('final CTA: at max scroll on a 2x display the scrub still resolves to the shipped DOM (fractional max scroll)', async ({ browser }, info) => {
+test('final CTA rests at max scroll at 2x DPR (smoke; the fractional-scroll guard is the unit test in progress.test.ts)', async ({ browser }, info) => {
   const ctx = await browser.newContext({ baseURL: info.project.use.baseURL, viewport: { width: 1440, height: 899 }, deviceScaleFactor: 2 });
   const page = await ctx.newPage();
   try {
@@ -368,4 +378,19 @@ test('final CTA: at max scroll on a 2x display the scrub still resolves to the s
     expect(gap).toBeGreaterThanOrEqual(0); // sanity: we are at the bottom, and may be a fraction short of the rounded max
     expect(await page.locator('.h-deep').getAttribute('style')).toBeNull();
   } finally { await ctx.close(); }
+});
+
+test('themes: a resize that keeps the mode re-decides the pin (Review Focus 1)', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await open(page);
+  const themes = page.locator('#themes');
+  expect(await themes.getAttribute('data-pin')).toBeNull();
+  await page.setViewportSize({ width: 1440, height: 600 });
+  await expect(themes).toHaveAttribute('data-pin', 'off');
+  expect(await themes.evaluate((e) => e.getBoundingClientRect().height / innerHeight)).toBeLessThan(2);
+  expect(new Set(await cardLefts(page)).size).toBe(3);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await expect(themes).not.toHaveAttribute('data-pin', /.*/);
+  expect(await page.locator('#themes .pin').evaluate((e) => getComputedStyle(e).position)).toBe('sticky');
+  expect(await themes.evaluate((e) => e.getBoundingClientRect().height / innerHeight)).toBeGreaterThan(3 - 0.01);
 });

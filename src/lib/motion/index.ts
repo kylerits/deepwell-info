@@ -22,22 +22,23 @@ const running = new Map<HTMLElement, Entrance>();
 const hold = pageHold();
 let stopSmooth: (() => void) | null = null;
 const endSmooth = (): void => { stopSmooth?.(); stopSmooth = null; };
-let scenes: SceneInstance[] = [];
+let scenes: { section: HTMLElement; inst: SceneInstance }[] = [];
+let fitTimer = 0;
 let raf = 0;
 
 /** Scrubs run at `full` only. Reads every range first, then writes every scrub; a hold jumps all to rest. */
 function drive(): void {
   raf = 0;
   const held = hold.isHeld();
-  const ranges = scenes.map((s) => s.range());
-  scenes.forEach((s, i) => s.scrub(held ? 1 : rangeProgress(scrollY, ranges[i]!), held));
+  const ranges = scenes.map((s) => s.inst.range());
+  scenes.forEach((s, i) => s.inst.scrub(held ? 1 : rangeProgress(scrollY, ranges[i]!), held));
 }
 const onScroll = (): void => { if (!raf) raf = requestAnimationFrame(drive); };
 type Mounted = { scene?: Scene; inst: SceneInstance | null };
 function mountScene(s: HTMLElement, m: MotionMode): Mounted {
   const scene = m === 'full' ? SCENES[s.dataset.scene ?? ''] : undefined;
   const inst = scene?.mount(s) ?? null;
-  if (inst) scenes.push(inst);
+  if (inst) scenes.push({ section: s, inst });
   return { scene, inst };
 }
 
@@ -95,8 +96,9 @@ function build(m: MotionMode, initial: boolean, keep: () => void): void {
 function teardown(): void {
   endSmooth();
   removeEventListener('scroll', onScroll); cancelAnimationFrame(raf); raf = 0;
-  for (const sc of scenes) sc.destroy();
+  for (const sc of scenes) sc.inst.destroy();
   scenes = [];
+  clearTimeout(fitTimer);
   for (const s of document.querySelectorAll('[data-pin]')) s.removeAttribute('data-pin'); // a scene that declined to pin leaves its mark
   io?.disconnect(); io = null;
   for (const [s, e] of running) { e.settle(); done(s); }
@@ -124,6 +126,25 @@ function rebuild(): void {
   build(next, false, keep);
 }
 
+/** A resize within `full` changes what the scenes measured at mount (whether the Themes pin fits, the stacked
+    offsets, every range). Each scene is destroyed (back to rest) and mounted afresh; an entrance that has not
+    played yet is re-armed around the new mount, and one that has played or is playing is left alone. */
+function remeasureScenes(): void {
+  if (mode !== 'full') return;
+  const keep = placeAnchor();
+  const had = new Set(scenes.map((s) => s.section));
+  for (const sc of scenes) sc.inst.destroy();
+  scenes = [];
+  for (const s of document.querySelectorAll<HTMLElement>('[data-scene]')) {
+    if (!SCENES[s.dataset.scene ?? '']) continue;
+    const waiting = pending.get(s);
+    if (waiting) { waiting.settle(); pending.delete(s); io?.unobserve(s); arm(s, mode, mountScene(s, mode)); } // re-armed with the new fit
+    else if (s.hasAttribute('data-scene-done') || had.has(s)) mountScene(s, mode); // played, or playing around its own scene
+  }
+  keep();
+  drive();
+}
+
 /** Held (tab hidden, battery saver): finish what is running; due entrances settle in trigger(). */
 function onHeld(): void {
   endSmooth();
@@ -149,6 +170,11 @@ export function startMotion(): void {
     addEventListener('scroll', sweep, { passive: true });
     addEventListener('dw:atmosphere', rebuild);
     rm.addEventListener('change', rebuild);
-    addEventListener('resize', () => { const before = mode; rebuild(); if (mode === before) onScroll(); }); // same mode: re-measure ranges
+    addEventListener('resize', () => {
+      const before = mode; rebuild();
+      if (mode !== before) return;
+      onScroll();
+      clearTimeout(fitTimer); fitTimer = window.setTimeout(remeasureScenes, 120); // same mode: re-measure the scenes
+    });
   });
 }

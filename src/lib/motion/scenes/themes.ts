@@ -7,6 +7,9 @@ import { pinRange } from '../progress';
 import { snapshot } from '../snapshot';
 import { docTop, type Scene } from './types';
 
+/** The pin's `padding-block: 48px` top and bottom (motion.css, `.sec--pin > .pin`). Keep the two in step. */
+const PIN_PAD = 96;
+
 export const themes: Scene = {
   owns: ['.tcard'],
   mount(section) {
@@ -17,7 +20,7 @@ export const themes: Scene = {
     if (!pin || !wrap || cards.length !== 3 || captions.some((c) => !c)) return null;
     section.removeAttribute('data-pin');
     // The pin is a screen of sticky content: if it would not fit, leave the section as a normal one.
-    if (wrap.getBoundingClientRect().height + 96 > innerHeight) { section.setAttribute('data-pin', 'off'); return null; }
+    if (wrap.getBoundingClientRect().height + PIN_PAD > innerHeight) { section.setAttribute('data-pin', 'off'); return null; }
     const snap = snapshot([...cards, ...(captions as HTMLElement[])]);
     let tl: Timeline | null = null;
     const build = (): Timeline => { // measured at rest: the row is the real layout
