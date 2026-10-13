@@ -160,22 +160,21 @@ test('smooth scroll runs at full on desktop only', async ({ page }) => {
     await expect(page.locator('html')).not.toHaveClass(/\blenis\b/);
   }
 });
-test('the wheel glides: scroll lags the input, then arrives', async ({ page }) => {
+test('the wheel glides: Lenis takes the wheel from the browser, then scroll arrives', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await open(page);
-  // Timed inside the page, from the wheel event: Playwright's own round trips are far too slow and uneven in
-  // headless to time a 60 ms window. Lenis (lerp 0.07) takes ~380 ms to cover 80% of a throw; a native jump is one frame.
+  // Structural, not wall-clock (headless here renders a few frames a second): Lenis listens on window from startup,
+  // so by the time this later window listener runs it has already cancelled the native wheel scroll. A native
+  // wheel is not cancelled, and the browser would scroll itself.
   await page.evaluate(() => {
-    const w = window as unknown as { __wheel: number; __at80: number };
-    w.__wheel = 0; w.__at80 = 0;
-    addEventListener('wheel', () => { w.__wheel ||= performance.now(); }, { passive: true, once: true });
-    addEventListener('scroll', () => { if (w.__wheel && !w.__at80 && scrollY >= 480) w.__at80 = performance.now(); });
+    const w = window as unknown as { __wheelTaken: boolean[] };
+    w.__wheelTaken = [];
+    addEventListener('wheel', (e) => { w.__wheelTaken.push(e.defaultPrevented); }, { passive: true });
   });
   await page.mouse.move(700, 450);
   await page.mouse.wheel(0, 600);
   await expect.poll(() => page.evaluate(() => scrollY), { timeout: 20000 }).toBeGreaterThan(550);
-  const lag = await page.evaluate(() => { const w = window as unknown as { __wheel: number; __at80: number }; return w.__at80 - w.__wheel; });
-  expect(lag).toBeGreaterThan(200);
+  expect(await page.evaluate(() => (window as unknown as { __wheelTaken: boolean[] }).__wheelTaken)).toEqual([true]);
 });
 test('a hold hands scroll back to the browser, and release restores smoothing', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -185,15 +184,42 @@ test('a hold hands scroll back to the browser, and release restores smoothing', 
   await setHidden(page, false);
   await expect(page.locator('html')).toHaveClass(/\blenis\b/);
 });
+/** Click a link in the page and sample scrollY every frame until it has stopped moving for ~0.8 s. */
+const glideFrom = (page: Page, link: string) => page.locator(link).evaluate((el) => new Promise<number[]>((res) => {
+  const out: number[] = []; let still = 0; const t0 = performance.now();
+  (el as HTMLElement).click();
+  const f = () => {
+    const y = Math.round(scrollY), prev = out.at(-1);
+    out.push(y); still = prev === y ? still + 1 : 0;
+    if (performance.now() - t0 > 15000 || (still >= 3 && performance.now() - t0 > 800)) res(out); else requestAnimationFrame(f);
+  };
+  f();
+}));
+/** The glide is one steady approach: it never jumps to the target and gets pulled back (a native fragment jump). */
+const expectGlide = (ys: number[], from: number, to: number) => {
+  const dir = Math.sign(to - from), jitter = 2;
+  expect(Math.abs(ys[0] - to)).toBeGreaterThan(Math.abs(from - to) * 0.3);        // not already at the target
+  for (let i = 1; i < ys.length; i++) expect((ys[i] - ys[i - 1]) * dir).toBeGreaterThanOrEqual(-jitter); // monotone
+  expect(ys.some((y) => Math.abs(y - from) > 20 && Math.abs(y - to) > 20)).toBe(true);                   // intermediates
+  expect(Math.abs(ys.at(-1)! - to)).toBeLessThan(4);
+};
 test('anchor links glide to their target (Review Focus 5)', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await open(page);
   await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
-  await page.waitForTimeout(800);
-  // el.click(), not Playwright's click(): its scroll-into-view nudges the page natively just before the click, and
-  // Lenis (which reads the next frame) would then aim from a stale position. A real reader does not do that.
-  await page.locator('.foot__links a[href="#pricing"]').evaluate((a) => (a as HTMLElement).click());
-  // The glide is frame-rate bound and headless WebGL runs few fps, so poll for arrival rather than sleep.
-  await expect.poll(() => page.locator('#pricing').evaluate((e) => Math.abs(e.getBoundingClientRect().top)), { timeout: 20000 }).toBeLessThan(4);
+  await page.waitForTimeout(1500);
+  const from = await page.evaluate(() => scrollY);
+  const to = await page.locator('#pricing').evaluate((e) => Math.round(e.getBoundingClientRect().top + scrollY));
+  expectGlide(await glideFrom(page, '.foot__links a[href="#pricing"]'), from, to);
+  expect(Math.abs(await page.locator('#pricing').evaluate((e) => e.getBoundingClientRect().top))).toBeLessThan(4);
   await expect(page.locator('#pricing')).toHaveAttribute('data-scene-done', '');
+  expect(new URL(page.url()).hash).toBe('#pricing'); // Back and deep links keep working
+});
+test('the logo glides back to the top (Review Focus 5)', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await open(page);
+  await page.evaluate(() => scrollTo(0, 4000));
+  await page.waitForTimeout(1500);
+  const from = await page.evaluate(() => scrollY);
+  expectGlide(await glideFrom(page, '.top__logo'), from, 0);
 });
