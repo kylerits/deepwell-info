@@ -1,0 +1,20 @@
+---
+interface Props { id: 'hero' | 'final' | 'retry'; label: string; note?: string }
+const { id, label, note } = Astro.props;
+---
+<div data-waitlist-root>
+  <form class="wait" method="post" action="/api/waitlist" data-waitlist>
+    <div class="wait__field">
+      <label class="wait__label" for={`${id}-email`}>Email address</label>
+      <input class="wait__input" id={`${id}-email`} name="email" type="email" required autocomplete="email" placeholder="you@example.com" />
+    </div>
+    <div class="wait__trap" aria-hidden="true"><label>Company <input name="company" tabindex="-1" autocomplete="off" /></label></div>
+    <button class="btn" type="submit">{label}</button>
+  </form>
+  {note && <p class="micro" data-waitlist-note>{note}</p>}
+  <p class="noted" role="status" tabindex="-1" data-waitlist-status></p>
+</div>
+<script>
+  import { wireWaitlistForms } from '../lib/waitlist/client';
+  wireWaitlistForms(document);
+</script>

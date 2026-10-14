@@ -1,0 +1,16 @@
+---
+import Cover from './Cover.astro';
+import { COVER_POOL } from '../../lib/cover/pool';
+import { coverModel } from '../../lib/cover/cover-model';
+// Build-time pick, shown when JS is off. COVER_DEFAULT pins it for reproducible test builds.
+const pinned = process.env.COVER_DEFAULT;
+const def = COVER_POOL.some((e) => e.slug === pinned) ? pinned! : COVER_POOL[Math.floor(Math.random() * COVER_POOL.length)]!.slug;
+const pick = COVER_POOL.map((e) => `html[data-cover="${e.slug}"] .cover-slot[data-slug="${e.slug}"]`).join(',\n');
+const css = `.cover-slot{display:none}\nhtml:not([data-cover]) .cover-slot[data-default],\n${pick}{display:block}`;
+---
+<style is:inline set:html={css}></style>
+{COVER_POOL.map((e) => (
+  <div class="cover-slot" data-slug={e.slug} data-default={e.slug === def ? '' : undefined}>
+    <Cover m={coverModel(e)} />
+  </div>
+))}

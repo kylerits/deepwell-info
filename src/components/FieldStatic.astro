@@ -1,0 +1,10 @@
+---
+// descent: the landing page's scroll-linked static parallax (atmosphere.css). Utility pages omit it.
+const { descent = false } = Astro.props as { descent?: boolean };
+---
+<div class:list={['field-static', { 'field-static--descent': descent }]} aria-hidden="true">
+  <div class="volumes volumes--page"></div>
+  <i class="shaft shaft--s2"></i>
+  <i class="shaft shaft--thin shaft--s5"></i>
+</div>
+<div class="vignette" aria-hidden="true"></div>

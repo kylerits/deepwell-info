@@ -1,0 +1,17 @@
+---
+import { LAUNCH_STATE } from '../../config/launch';
+import { APP_URL } from '../../config/site';
+import WaitlistForm from '../WaitlistForm.astro';
+---
+<section class="sec sec--cta" id="start" aria-labelledby="cta-h" data-depth="0.96" data-scene="final-cta">
+  <div class="wrap"><div class="col smudge">
+    <p class="eyebrow">END OF ORIENTATION</p>
+    <h2 class="h-deep" id="cta-h">Go deeper.</h2>
+    <p class="narr recede">Orientation is complete. The archive is not. 19,000+ files remain, catalogued for your comfort. Do sleep afterward.</p>
+    <div data-launch-slot="final">
+      {LAUNCH_STATE === 'public'
+        ? <div class="cta-row"><a class="btn" href={APP_URL}>Start reading — free</a></div>
+        : <WaitlistForm id="final" label="Join the waitlist" note="We’ll email you once. When it’s ready." />}
+    </div>
+  </div></div>
+</section>

@@ -1,0 +1,12 @@
+---
+import UtilityPage from '../../components/UtilityPage.astro';
+import WaitlistForm from '../../components/WaitlistForm.astro';
+import { WAITLIST_ERROR_EYEBROW, WAITLIST_ERROR_PAGE } from '../../lib/waitlist/copy';
+---
+<!-- Landing page for a failed no-JS waitlist post (worker/waitlist.ts). The JS path reports errors in place. -->
+<UtilityPage title="Sign-up didn't go through — Deepwell" path="/waitlist/error/">
+  <p class="eyebrow">{WAITLIST_ERROR_EYEBROW}</p>
+  <p class="narr" role="alert">{WAITLIST_ERROR_PAGE}</p>
+  <WaitlistForm id="retry" label="Join the waitlist" />
+  <div class="cta-row"><a class="btn btn--secondary" href="/">Back to the archive</a></div>
+</UtilityPage>

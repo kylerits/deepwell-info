@@ -1,0 +1,32 @@
+---
+import Base from '../layouts/Base.astro';
+import { COVER_SLUGS } from '../lib/cover/pool';
+import FieldStatic from '../components/FieldStatic.astro';
+import Field from '../components/Field.svelte';
+import Hero from '../components/sections/Hero.astro';
+import TrustStrip from '../components/sections/TrustStrip.astro';
+import Problem from '../components/sections/Problem.astro';
+import Module01 from '../components/sections/Module01.astro';
+import Module02 from '../components/sections/Module02.astro';
+import Module03 from '../components/sections/Module03.astro';
+import Themes from '../components/sections/Themes.astro';
+import Pricing from '../components/sections/Pricing.astro';
+import Licensing from '../components/sections/Licensing.astro';
+import Faq from '../components/sections/Faq.astro';
+import FinalCta from '../components/sections/FinalCta.astro';
+import Footer from '../components/sections/Footer.astro';
+import '../styles/motion.css';
+---
+<Base coverSlugs={COVER_SLUGS} motion>
+  <main class="dw">
+    <FieldStatic descent />
+    <Field client:idle />
+    <div class="tube" aria-hidden="true"></div>
+    <Hero /><TrustStrip /><Problem /><Module01 /><Module02 /><Module03 /><Themes /><Pricing /><Licensing /><Faq /><FinalCta /><Footer />
+    <div class="osd" aria-hidden="true">▶ SP <span data-osd-time>00:14:07</span>   TRACKING ──┼──</div>
+  </main>
+</Base>
+<script>
+  import { startMotion } from '../lib/motion';
+  startMotion();
+</script>

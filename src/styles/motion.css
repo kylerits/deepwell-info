@@ -1,0 +1,25 @@
+/* Motion scenes (spec: ~/projects/Deepwell/docs/specs/2026-10-12-marketing-site-motion-scenes-design.md).
+   Never target a .smudge or an ancestor of one: opacity, filter, transform or will-change there makes a
+   backdrop root and the smudge's blur collapses into a flat tint (atmosphere.css, above .smudge). */
+
+/* The hero is the only pre-hidden content, and only while bootScript's arm is set. The motion module lifts
+   it once it has taken over (or the 2 s fail-open does). The h1 is never hidden: LCP, and legibility first. */
+html[data-motion-arm] :is(#top .col > :not(h1), #top .hero__visual > *) { opacity: 0; }
+
+/* The real text of a decrypting label, for screen readers, while the visible copy scrambles. */
+.dw-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+
+/* The summary's rule draws across (scaleX via a custom property; at rest the var is unset, so it is 1). */
+.summary__label::after { transform: scaleX(var(--dw-rule, 1)); transform-origin: 0 50%; }
+/* Module 02's progress bar fills from its left edge. */
+.reader__prog i { transform-origin: 0 50%; }
+
+/* Themes pin (motion-scenes spec, Part 2): 100vh of sticky screen plus 220vh of scroll, at `full` on desktop
+   only, and only when the content fits the screen (the scene sets data-pin="off" otherwise). Sticky is not
+   a backdrop root, so the smudges inside keep their blur. */
+@media (min-width: 901px) {
+  html[data-motion="full"] .sec--pin:not([data-pin="off"]) { height: 320vh; padding-block: 0; }
+  html[data-motion="full"] .sec--pin:not([data-pin="off"]) > .pin {
+    position: sticky; top: 0; min-height: 100vh; display: grid; align-content: center; padding-block: 48px;
+  }
+}

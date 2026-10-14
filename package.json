@@ -1,0 +1,36 @@
+{
+  "name": "deepwell-info",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.22.0",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "build:pilot": "PUBLIC_LAUNCH_STATE=pilot ASTRO_OUT_DIR=dist-pilot astro build",
+    "build:public": "PUBLIC_LAUNCH_STATE=public ASTRO_OUT_DIR=dist-public astro build",
+    "check": "astro check && tsc -p worker",
+    "test": "vitest run",
+    "test:build": "COVER_DEFAULT=scp-173 pnpm build:pilot && COVER_DEFAULT=scp-173 pnpm build:public && vitest run --config vitest.build.config.ts",
+    "test:e2e": "pnpm build:pilot && pnpm build:public && playwright test",
+    "budget": "node scripts/check-budget.mjs dist",
+    "cover:pool": "node scripts/gen-cover-pool.mjs",
+    "deploy": "PUBLIC_LAUNCH_STATE=pilot astro build && pnpm budget && wrangler deploy"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@astrojs/svelte": "^9.0.1",
+    "@cloudflare/workers-types": "^5.20261007.1",
+    "@playwright/test": "^1.64.0",
+    "animejs": "4.5.0",
+    "astro": "^7.3.7",
+    "happy-dom": "^20.14.5",
+    "lenis": "1.3.26",
+    "svelte": "^5.57.2",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.11",
+    "wrangler": "^4.148.0"
+  }
+}

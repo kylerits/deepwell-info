@@ -1,0 +1,10 @@
+/* VENDORED from ~/git_local/deepwell/apps/web/src/lib/styles/tokens.css on 2026-10-08 (extended class + ACS axis colours; Deepwell additions not yet upstreamed to design/brand/tokens.css). */
+:root {
+  --color-class-thaumiel: #2F8074;
+  --color-class-neutralized: #6C7770;
+  --color-class-apollyon: #9C4F78;
+  --color-acs-slate: #5B6470;
+  --color-acs-blue: #3F6F96;
+  --color-acs-ochre: #A8892E;
+  --color-acs-orange: #C0692E;
+}

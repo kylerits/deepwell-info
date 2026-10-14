@@ -1,0 +1,135 @@
+/* VENDORED from ~/projects/Deepwell/design/marketing_site/handoff/reference/landing.css
+   (lines 239-254 .reader/.reader__lamp/.reader__edge, 284-383 cover and class panel),
+   with the Task 11 edits noted inline. The focus ring lives once, in site.css. */
+
+/* The product: the one warm thing on screen. Edge-lit by lamp amber, never boxed or shadowed. */
+.reader {
+  position: relative; isolation: isolate; margin: 0; width: 100%;
+  padding: 34px 40px 80px; background: #131019; color: var(--ink);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 72px), transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 72px), transparent 100%);
+}
+.reader--sm { padding: 28px 32px 68px; }
+.reader__lamp {
+  position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(270deg, rgba(217, 151, 63, 0.17) 0, rgba(217, 151, 63, 0.06) 34%, rgba(217, 151, 63, 0) 72%);
+}
+.reader__edge {
+  position: absolute; right: 0; top: 5%; bottom: 16%; width: 2px; pointer-events: none;
+  background: linear-gradient(to bottom, rgba(217, 151, 63, 0), rgba(238, 178, 92, 0.95) 22%, rgba(217, 151, 63, 0.7) 64%, rgba(217, 151, 63, 0));
+}
+
+/* Hero cover: the app's page-zero cover (reader/cover/Cover.svelte + ClassPanel.svelte), Black Lodge
+   tokens resolved. Ground is Black Lodge paper; lamp amber lights the right edge; no border, no shadow.
+   Sizes the app derives from the viewport (vh/vw) are pinned to this card. */
+.cover { position: relative; isolation: isolate; margin: 0; width: 100%; background: #131019; color: var(--ink); }
+.cover__page {
+  --cv-tone: #C24B54; --cv-tone-text: #C24B54;
+  min-height: 540px; display: grid; grid-template-rows: auto auto 1fr auto; gap: 20px;
+  padding: 30px 36px 28px;
+}
+.cover__page.has-panel { grid-template-rows: auto auto auto 1fr auto; }
+.cover__page[data-tone="safe"] { --cv-tone: #4C7D6B; --cv-tone-text: #4C7D6B; }
+.cover__page[data-tone="euclid"] { --cv-tone: #B8862E; --cv-tone-text: #B8862E; }
+/* Keter text takes Black Lodge's lifted curtain red (#A8332F is 2.9:1 on the paper); the bar and emblem keep the class token. */
+.cover__page[data-tone="keter"] { --cv-tone: #A8332F; --cv-tone-text: #C24B54; }
+.cover__head { display: flex; align-items: center; justify-content: space-between; }
+.cover__mark { display: inline-grid; gap: 8px; }
+.cover__stamp {
+  font-family: var(--f-type); font-weight: 700; font-size: clamp(16px, 1.55vw, 22px);
+  letter-spacing: 0.14em; color: var(--cv-tone-text); white-space: nowrap;
+}
+.cover__bar { display: flex; gap: 4px; }
+.cover__seg { width: 40px; height: 8px; }
+.cover__mark.is-stamped .cover__seg { flex: 1; }
+.cover__seg--1 { background: var(--ink); }
+.cover__seg--2 { background: var(--cv-tone); }
+.cover__seg--3 { background: #453B54; }
+.cover__emblem { font-family: var(--f-type); font-size: 20px; line-height: 1; color: var(--ink-soft); }
+.cover__emblem .acs-ico { display: block; width: 2em; height: 2em; color: var(--cv-tone); }
+.cover__classline {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;
+  font-family: var(--f-type); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.cover__class { color: var(--cv-tone-text); font-weight: 700; }
+.cover__series { color: var(--ink-soft); }
+.cover__title {
+  font-family: var(--f-ui); font-weight: 800; font-size: clamp(26px, 2.2vw, 32px);
+  line-height: 1.199; letter-spacing: -0.01em; text-wrap: balance;
+}
+.cover__art { position: relative; min-height: 120px; overflow: hidden; border: 1px solid var(--line); border-radius: 4px; }
+.cover__plate {
+  position: absolute; inset: 0; margin: 0; display: flex; align-items: center; justify-content: center;
+  font-family: var(--f-type); font-size: clamp(0.5rem, 2.1vw, 0.8rem); line-height: 1.08; white-space: pre;
+  color: color-mix(in srgb, var(--cv-tone) 55%, #A2977E); opacity: 0.55; user-select: none; pointer-events: none;
+}
+.cover__foot { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
+.cover__credits { display: grid; gap: 4px; font-family: var(--f-type); font-size: 12px; line-height: 1.33; letter-spacing: 0.08em; color: var(--ink); }
+.cover__byline { display: flex; flex-wrap: wrap; gap: 0 0.6em; }
+.cover__lbl, .cover__license { color: var(--ink-soft); text-transform: uppercase; }
+
+/* Class panel (the file's leading ACS bar). Only SCP-4999 in the pool carries one. */
+.cpanel { display: grid; gap: 12px; color: var(--ink); }
+.cpanel__top {
+  display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 12px;
+  padding-bottom: 12px; border-bottom: 4px solid var(--ink);
+}
+.cpanel__rules { display: grid; gap: 4px; align-self: center; }
+.cpanel__rules span { height: 4px; background: var(--rule-tone, var(--ink-soft)); }
+.cpanel__rules[data-tone="safe"] { --rule-tone: #4C7D6B; }
+.cpanel__rules[data-tone="euclid"] { --rule-tone: #B8862E; }
+.cpanel__rules[data-tone="keter"] { --rule-tone: #A8332F; }
+.cpanel__cell--wide { grid-column: 1 / -1; }
+.cpanel__cell[data-axis="contain-keter"] { --axis: #A8332F; }
+.cpanel__cell[data-axis="contain-euclid"] { --axis: #B8862E; }
+.cpanel__cell[data-axis="contain-safe"] { --axis: #4C7D6B; }
+.cpanel__level { display: grid; justify-items: end; line-height: 1.28572; text-transform: uppercase; }
+.cpanel__lv { font: 800 20px/1.28572 var(--f-ui); }
+.cpanel__nm { font: 600 12px/1.28572 var(--f-ui); letter-spacing: 0.08em; }
+.cpanel__axes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.cpanel__cell {
+  --axis: var(--ink-soft);
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; min-width: 0;
+  padding: 8px 12px; border-left: 8px solid var(--axis); background: color-mix(in srgb, var(--axis) 14%, transparent);
+}
+.cpanel__cell[data-axis="disrupt-dark"] { --axis: #5B6470; }
+.cpanel__cell[data-axis="disrupt-vlam"] { --axis: #3F6F96; }
+.cpanel__cell[data-axis="disrupt-keneq"] { --axis: #A8892E; }
+.cpanel__cell[data-axis="disrupt-ekhi"] { --axis: #C0692E; }
+.cpanel__cell[data-axis="disrupt-amida"] { --axis: #A8332F; }
+.cpanel__cell[data-axis="risk-notice"] { --axis: #4C7D6B; }
+.cpanel__cell[data-axis="risk-caution"] { --axis: #3F6F96; }
+.cpanel__cell[data-axis="risk-warning"] { --axis: #A8892E; }
+.cpanel__cell[data-axis="risk-danger"] { --axis: #C0692E; }
+.cpanel__cell[data-axis="risk-critical"] { --axis: #A8332F; }
+.cpanel__txt { flex: 1 0 auto; }
+.cpanel__k { display: block; font-family: var(--f-type); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); }
+.cpanel__v { display: block; font: 800 16px/1.28572 var(--f-ui); text-transform: uppercase; overflow-wrap: anywhere; }
+.cpanel__chip { flex: none; display: inline-flex; align-items: center; gap: 4px; padding: 2px 2px 2px 8px; border-radius: 999px; background: var(--ink); }
+.cpanel__n { font: 800 14px/1 var(--f-ui); color: #131019; }
+.cpanel__ring {
+  flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%;
+  border: 2px solid var(--axis); background: color-mix(in srgb, var(--axis) 18%, #131019); color: var(--axis);
+}
+.cpanel__ring .acs-ico { display: block; width: 24px; height: 24px; }
+
+/* Under the cover: a quiet secondary control into the app, then the attribution. */
+.cover__after { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; margin-top: 22px; }
+.cover__read {
+  display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 16px;
+  border: 1px solid #453B54; border-radius: 4px; background: transparent; color: var(--ink);
+  font: 500 14.5px/1 var(--f-ui); text-decoration: none; white-space: nowrap; cursor: pointer;
+  transition: border-color 120ms var(--ease), background-color 120ms var(--ease);
+}
+.cover__read svg { flex: none; color: var(--ink-soft); }
+.cover__read:hover { border-color: var(--ink-soft); background: rgba(234, 223, 198, 0.04); }
+.cover__attr { margin: 0; font: 400 12.5px/1.6 var(--f-type); letter-spacing: 0.03em; color: var(--ink-soft); text-wrap: pretty; }
+.cover__attr a { color: var(--ink); text-decoration: underline; text-decoration-color: rgba(234, 223, 198, 0.35); text-underline-offset: 3px; }
+.cover__attr a:hover { text-decoration-color: var(--ink); }
+
+@media (max-width: 560px) {
+  .cover__page { min-height: 500px; padding: 26px 24px 24px; }
+  /* Phone padding for the reader lives here, after the base .reader rules (site.css loads first). */
+  .reader { padding: 28px 26px 72px; }
+  .reader--sm { padding: 24px 24px 64px; }
+}

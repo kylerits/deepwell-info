@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Deepwell app icon / PWA maskable icon v3 — "Black Lodge".
+       Blue-black field, cream Stack mark with a dreamy teal halo,
+       thin curtain-red ring. Keep content in the 80% safe zone.
+       Original Deepwell geometry (see deepwell-mark.svg). -->
+  <defs>
+    <radialGradient id="lodge" cx="50%" cy="42%" r="70%">
+      <stop offset="0%" stop-color="#1E1830"/>
+      <stop offset="100%" stop-color="#131019"/>
+    </radialGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="14" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#lodge)"/>
+  <circle cx="256" cy="256" r="196" fill="none" stroke="#C24B54" stroke-width="6" opacity="0.85"/>
+  <!-- dreamy teal disc behind the mark -->
+  <circle cx="256" cy="256" r="126" fill="#4E938C" opacity="0.55" filter="url(#glow)"/>
+  <!-- Stack mark at 3.2x -->
+  <g transform="translate(96,93) scale(3.2)" filter="url(#glow)" color="#EADFC6"
+     fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 37 28 A 37.5 15 0 1 0 63 28 A 2 2 0 0 0 63 32
+             A 31 8.75 0 1 1 37 32 A 2 2 0 0 0 37 28 Z"
+          fill="currentColor" stroke="none"/>
+    <path d="M 23.5 63.5 L 50 74 L 76.5 63.5" opacity="0.7"/>
+    <path d="M 30.5 81 L 50 89 L 69.5 81" opacity="0.42"/>
+    <g stroke="none" fill="currentColor">
+      <circle cx="25" cy="15" r="5.5"/>
+      <circle cx="50" cy="26" r="8.25"/>
+      <circle cx="75" cy="15" r="5.5"/>
+    </g>
+  </g>
+</svg>

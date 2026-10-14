@@ -1,0 +1,64 @@
+---
+import AcsIcon from './AcsIcon.astro';
+import type { CoverModel } from '../../lib/cover/cover-model';
+interface Props { m: CoverModel }
+const { m } = Astro.props;
+---
+<figure class="cover" aria-label={m.ariaLabel}>
+  <i class="reader__lamp" aria-hidden="true"></i>
+  <i class="reader__edge" aria-hidden="true"></i>
+  <div class:list={['cover__page', { 'has-panel': m.panel }]} data-tone={m.tone}>
+    <div class="cover__head">
+      <div class:list={['cover__mark', { 'is-stamped': m.stamp }]}>
+        {m.stamp && <div class="cover__stamp">/{m.stamp}</div>}
+        <div class="cover__bar" aria-hidden="true"><span class="cover__seg cover__seg--1"></span><span class="cover__seg cover__seg--2"></span><span class="cover__seg cover__seg--3"></span></div>
+      </div>
+      <div class="cover__emblem" aria-hidden="true">{m.classToken ? <AcsIcon axis="containment" value={m.classToken} /> : '◇'}</div>
+    </div>
+    <div class="cover__titleblock">
+      {(m.classLabel || m.seriesLabel) && (
+        <div class="cover__classline">
+          {m.classLabel && <span class="cover__class">{m.classLabel}</span>}
+          {m.seriesLabel && <span class="cover__series">Series {m.seriesLabel}</span>}
+        </div>
+      )}
+      <div class="cover__title" role="heading" aria-level="2">{m.name}</div>
+    </div>
+    {m.panel && (
+      <div class="cpanel" role="group" aria-label="Anomaly classification">
+        <div class="cpanel__top">
+          <div class="cpanel__rules" aria-hidden="true" data-tone={m.panel.containTone}><span></span><span></span><span></span></div>
+          {m.panel.levelLabel && <div class="cpanel__level"><span class="cpanel__lv">{m.panel.levelLabel}</span>{m.panel.levelName && <span class="cpanel__nm">{m.panel.levelName}</span>}</div>}
+        </div>
+        {(m.panel.disruption || m.panel.risk) && (
+          <div class="cpanel__axes">
+            {m.panel.secondary && <div class="cpanel__cell cpanel__cell--wide" data-axis={`contain-${m.panel.containTone}`}><div class="cpanel__txt"><span class="cpanel__k">Secondary class</span><span class="cpanel__v">{m.panel.secondary}</span></div></div>}
+            {m.panel.disruption && (
+              <div class="cpanel__cell" data-axis={`disrupt-${m.panel.disruption.token ?? 'unknown'}`}>
+                <div class="cpanel__txt"><span class="cpanel__k">Disruption</span><span class="cpanel__v">{m.panel.disruption.value}</span></div>
+                <span class="cpanel__chip">{m.panel.disruption.level && <span class="cpanel__n">{m.panel.disruption.level}</span>}<span class="cpanel__ring"><AcsIcon axis="disruption" value={m.panel.disruption.value} /></span></span>
+              </div>
+            )}
+            {m.panel.risk && (
+              <div class="cpanel__cell" data-axis={`risk-${m.panel.risk.token ?? 'unknown'}`}>
+                <div class="cpanel__txt"><span class="cpanel__k">Risk</span><span class="cpanel__v">{m.panel.risk.value}</span></div>
+                <span class="cpanel__chip">{m.panel.risk.level && <span class="cpanel__n">{m.panel.risk.level}</span>}<span class="cpanel__ring"><AcsIcon axis="risk" value={m.panel.risk.value} /></span></span>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    )}
+    <div class="cover__art" aria-hidden="true"><pre class="cover__plate">{m.art}</pre></div>
+    <div class="cover__foot">
+      <div class="cover__credits">
+        <div class="cover__byline"><span class="cover__lbl">Written by</span><span>{m.authors}</span></div>
+        <div class="cover__license">CC BY-SA 3.0 · SCP Wiki</div>
+      </div>
+    </div>
+  </div>
+</figure>
+<div class="cover__after">
+  <a class="cover__read" href={m.appHref}><span>{m.readLabel}</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg></a>
+  <p class="cover__attr"><a href={m.wikiHref}>{m.quoted}</a><span>{m.attributionTail}</span></p>
+</div>

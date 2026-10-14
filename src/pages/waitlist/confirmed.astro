@@ -1,0 +1,8 @@
+---
+import UtilityPage from '../../components/UtilityPage.astro';
+import { WAITLIST_CONFIRMATION } from '../../lib/waitlist/copy';
+---
+<UtilityPage title="You're on the list — Deepwell" path="/waitlist/confirmed/">
+  <p class="noted" role="status">{WAITLIST_CONFIRMATION}</p>
+  <div class="cta-row"><a class="btn" href="/">Back to the archive</a></div>
+</UtilityPage>

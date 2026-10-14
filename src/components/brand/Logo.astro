@@ -1,0 +1,26 @@
+---
+// VENDORED geometry from ~/projects/Deepwell/design/brand/logo/logo-dark.svg (2026-10-08).
+// Inline (not <img>) so the wordmark uses the page's Courier Prime webfont. Never redraw.
+interface Props { decorative?: boolean }
+const { decorative = false } = Astro.props;
+---
+<svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 430 100" width="430" height="100"
+  {...(decorative ? { 'aria-hidden': 'true' } : { role: 'img', 'aria-label': 'Deepwell — Secure. Contain. Peruse.' })}>
+  <g transform="translate(2,2) scale(0.96)" color="#EADFC6" fill="none"
+     stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 37 28 A 37.5 15 0 1 0 63 28 A 2 2 0 0 0 63 32
+             A 31 8.75 0 1 1 37 32 A 2 2 0 0 0 37 28 Z"
+          fill="currentColor" stroke="none"/>
+    <path d="M 23.5 63.5 L 50 74 L 76.5 63.5" opacity="0.7"/>
+    <path d="M 30.5 81 L 50 89 L 69.5 81" opacity="0.42"/>
+    <g stroke="none" fill="currentColor">
+      <circle cx="25" cy="15" r="5.5"/>
+      <circle cx="50" cy="26" r="8.25"/>
+      <circle cx="75" cy="15" r="5.5"/>
+    </g>
+  </g>
+  <g font-family="'Courier Prime','Courier New',monospace" fill="#EADFC6">
+    <text x="118" y="53.5" font-size="40" font-weight="700" letter-spacing="4">DEEPWELL</text>
+    <text x="120" y="79" font-size="12.5" letter-spacing="4.5" fill="#A2977E">SECURE · CONTAIN · PERUSE</text>
+  </g>
+</svg>
