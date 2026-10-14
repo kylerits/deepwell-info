@@ -1,0 +1,305 @@
+- main [ref=e2]:
+  - region [ref=e4]:
+    - link "Deepwell" [ref=e6] [cursor=pointer]:
+      - /url: "#top"
+      - img [aria-hidden] [ref=e7]:
+        - generic [ref=e16]:
+          - generic [ref=e17]: DEEPWELL
+          - generic [ref=e18]: SECURE · CONTAIN · PERUSE
+    - generic [ref=e19]:
+      - generic [ref=e20]:
+        - paragraph [ref=e21]: ORIENTATION PACKET · FIELD PERSONNEL, LEVEL 2
+        - paragraph [ref=e23]: An unofficial reader for the SCP Wiki
+        - heading "Welcome to orientation." [level=1] [ref=e24]
+        - paragraph [ref=e26]: "New field staff are expected to be familiar with foundation protocol before any assignment. Deepwell is how you study: every article in the archive has been made available to you to read at your leisure."
+        - generic [ref=e67]:
+          - generic [ref=e68]:
+            - generic [ref=e69]:
+              - generic [ref=e70]: Email address
+              - textbox "Email address" [ref=e71]:
+                - /placeholder: you@example.com
+            - generic [ref=e73]:
+              - text: Company
+              - textbox [ref=e74]
+            - button "Get early access" [ref=e75] [cursor=pointer]
+          - status
+        - paragraph [ref=e76]: Free to read, always. No ads. No account required.
+        - generic [ref=e77]:
+          - paragraph [ref=e78]: Plain-language summary
+          - paragraph [ref=e79]: Deepwell is a free, cozy, offline reader for the SCP Wiki. Every file is rendered like a book and free forever.
+      - figure "Cover — The Clockworks" [ref=e82]:
+        - generic [ref=e83]:
+          - generic [ref=e84]: /SCP-914
+          - generic [ref=e96]:
+            - generic [ref=e97]:
+              - generic [ref=e98]: SAFE
+              - generic [ref=e99]: Series I
+            - heading "The Clockworks" [level=2] [ref=e100]
+          - generic [aria-hidden] [ref=e101]:
+            - generic: ". - . - . - . - . - . - . - . - . - . .- . - .- . - .- . - .- . - .- . -. .. - . -- .=#%%#=.. - . -- -. . - . . . -. - - :@@@@@@@@:. -. - - - . . . . - - .- . . %@@@@@@@@%. - - . . . - . .- - . - . .-#@@@@@@@@# -- . . .- . -. . -. - -..%@@@@@@#. .- . - . -. . - .. - . -- . +@@@@+- . - . - . - . - . - .. - . . -%@@@@@@%- -. - . - . - - .- . .- . . +@@@@@@@@@@+- .- . - . - . - . - -. . :@@@@@@@@@@@@: -. . . -- . -. - - . . *@@@@@@@@@@@@+.- . . . - - - .- . . . --#@@@@@@@@@@@@# . . - - - . - . - .. .- #@@@@@@@@@@@@#-. .- -- . . -. - . -. .#@@%%@@@@%%@@# . -. - . - . - . - . - . #@@**@@@@**@@# . - . - . - - . - . - . .#@@++@@@@++@@#.- . - . - . - - .- . - . #@@--@@@@--@@# - .- . - .- - -. .. - :--..----..--:-. - . -- -. - - . . . -- . . . -. - . -. - - - . . - - - . . . . - - .- . - .- . . - - .- - - .. . .- - . - .- . - . .- -"
+          - generic [ref=e102]:
+            - generic [ref=e103]:
+              - generic [ref=e104]:
+                - generic [ref=e105]: Written by
+                - generic [ref=e106]: Dr Gears
+              - link "CC BY-SA 3.0 · SCP Wiki" [ref=e107] [cursor=pointer]:
+                - /url: https://scp-wiki.wikidot.com/scp-914
+            - link "Read SCP-914 in Deepwell" [ref=e108] [cursor=pointer]:
+              - /url: https://app.readdeepwell.com/read/scp-914
+  - list [ref=e113]:
+    - listitem [ref=e114]:
+      - strong [ref=e115]: Always free to read
+      - text: — every article, no paywall, ever.
+    - listitem [ref=e116]:
+      - strong [ref=e117]: Works offline
+      - text: — install it, take the archive with you.
+    - listitem [ref=e118]:
+      - strong [ref=e119]: No ads, no tracking
+      - text: — pay once for the extras, or never. Your call.
+  - region [ref=e120]:
+    - generic [ref=e122]:
+      - paragraph [ref=e123]: INCIDENT REPORT · READING CONDITIONS
+      - heading "The wiki was built to edit. Deepwell is built to read." [level=2] [ref=e124]
+      - paragraph [ref=e125]: "The SCP Wiki is one of the internet’s greatest collaborative works: thousands of writers, nearly twenty thousand files, decades of dread. Unfortunately at times its reading conditions are, per standing assessment, poor. Cramped columns, tiny text, no dark mode worth the name, no offline access, and it forgets you the moment you close the tab. Personnel have been studying hazardous material in bad light. Deepwell fixes the reading and leaves the archive exactly where it belongs: free, open, and credited to the people who wrote it."
+      - generic [ref=e126]:
+        - paragraph [ref=e127]: Plain-language summary
+        - paragraph [ref=e128]: The wiki is great to read but can be hard on the eyes. Deepwell seeks to provide a more comfortable experience. It could never replace the wiki.
+  - region [ref=e129]:
+    - generic [ref=e130]:
+      - generic [ref=e131]:
+        - paragraph [ref=e132]: MODULE 01 · STUDY PROCEDURE
+        - heading "Read the files comfortably." [level=2] [ref=e133]
+        - paragraph [ref=e134]: Field staff are encouraged to explore the archive in their free time. To better facilitate this use case, Deepwell sets every article in Literata at a comfortable size and measure, the way a book is typeset rather than a wiki page. It is faithful to the source and easier on the eyes, built for the long, late night read that orientation inevitably becomes.
+        - list [ref=e135]:
+          - listitem [ref=e136]:
+            - strong [ref=e137]: Set for reading.
+            - text: Literata, generous line-height, a proper reading column — not a wall of wiki text.
+          - listitem [ref=e138]:
+            - strong [ref=e139]: Faithful to the file.
+            - text: Footnotes, collapsibles, tables, and anomaly-classification bars all render cleanly and correctly.
+          - listitem [ref=e140]:
+            - strong [ref=e141]: Made legible.
+            - text: Adjustable size and spacing, plus OpenDyslexic and Atkinson Hyperlegible for readers who need them.
+        - generic [ref=e142]:
+          - paragraph [ref=e143]: Plain-language summary
+          - paragraph [ref=e144]: Beautiful, faithful typography, with accessibility fonts.
+      - 'figure "Reading view: a passage with a footnote, and a choice of reading typeface" [ref=e146]':
+        - generic [ref=e147]:
+          - generic [ref=e148]:
+            - generic [ref=e149]: OpenDyslexic
+            - text: · 18 / 1.7
+          - generic [ref=e150]: 68 ch
+        - paragraph [ref=e152]:
+          - text: The inventory was taken at night, when the building was quiet enough to count. Each drawer was opened, its contents named aloud, and closed again. The clerk wrote in pencil, in case anything needed to be revised.
+          - superscript [ref=e153]: "1"
+        - paragraph [ref=e154]: 1. Nothing was revised.
+        - group "Reading typeface" [ref=e155]:
+          - button "Literata" [ref=e156] [cursor=pointer]
+          - button "Atkinson Hyperlegible" [ref=e157] [cursor=pointer]
+          - button "OpenDyslexic" [active] [pressed] [ref=e158] [cursor=pointer]
+  - region [ref=e159]:
+    - generic [ref=e161]:
+      - generic [ref=e162]:
+        - paragraph [ref=e163]: MODULE 02 · FIELD READINESS
+        - heading "Take the archive into the field." [level=2] [ref=e164]
+        - paragraph [ref=e165]: "Signal is not guaranteed where you’re going. Install Deepwell like an app, save the files you’ll need, and go. Tunnel, plane, a site with no reception: the archive comes with you, and it remembers exactly where you stopped."
+        - list [ref=e166]:
+          - listitem [ref=e167]:
+            - strong [ref=e168]: Truly offline.
+            - text: Save articles and read them with no connection at all.
+          - listitem [ref=e169]:
+            - strong [ref=e170]: Never lose your place.
+            - text: Deepwell resumes at the exact paragraph, every time.
+          - listitem [ref=e171]:
+            - strong [ref=e172]: Your library.
+            - text: Keep the files you love close, organized the way you like.
+        - generic [ref=e173]:
+          - paragraph [ref=e174]: Plain-language summary
+          - paragraph [ref=e175]: Install it, save articles, read with no internet. It remembers your place.
+      - generic [ref=e176]:
+        - list "In the field" [ref=e177]:
+          - listitem [ref=e178]:
+            - generic [ref=e179]: "01"
+            - text: Save
+          - listitem [ref=e180]:
+            - generic [ref=e181]: "02"
+            - text: Lose signal
+          - listitem [ref=e182]:
+            - generic [ref=e183]: "03"
+            - text: Resume
+        - figure "Saved for field use, no signal, and resumed at paragraph 14, where the reader stopped" [ref=e184]:
+          - generic [aria-hidden] [ref=e185]:
+            - generic [ref=e189]:
+              - generic [ref=e190]: Saving for field use…
+              - generic [ref=e191]: Saved for field use ✓
+            - generic [ref=e192]: No signal
+          - generic [ref=e199]:
+            - paragraph [ref=e201]: The clerk wrote in pencil, in case anything needed to be revised. Nothing was. The drawers were counted again the next night, and the night after that.
+            - generic [ref=e202]:
+              - generic [ref=e203]: ¶ 14 · Where you stopped
+              - paragraph [ref=e204]: By the fourth floor the drawers had stopped agreeing with the index. There were more of them than the plans allowed for, and they ran further back than the walls. The clerk counted anyway. That was the job.
+  - region [ref=e205]:
+    - generic [ref=e206]:
+      - generic [ref=e207]:
+        - paragraph [ref=e208]: MODULE 03 · PERSONNEL WELFARE
+        - heading "Workplace safety begins with a comfortable chair." [level=2] [ref=e209]
+        - paragraph [ref=e210]: "The files are unsettling by design. The reading shouldn’t be. Deepwell is procedural on the surface and warm underneath: three themes tuned for long shifts, a page with no distractions, and nothing between you and the story. The dread stays in the archive. You get the armchair."
+        - list [ref=e211]:
+          - listitem [ref=e212]:
+            - strong [ref=e213]: Three themes.
+            - text: Microfilm by day, Black Lodge by night, Cold Case when you want aged folder-stock sepia.
+          - listitem [ref=e214]:
+            - strong [ref=e215]: Distraction-free.
+            - text: No ads, no clutter, no chrome — the interface disappears while you read.
+          - listitem [ref=e216]:
+            - strong [ref=e217]: Just the story.
+            - text: Beautifully set, quietly yours.
+        - generic [ref=e218]:
+          - paragraph [ref=e219]: Plain-language summary
+          - paragraph [ref=e220]: Calm, cozy themes and a distraction-free page.
+      - 'figure "Distraction-free reading: the interface hidden, only the text" [ref=e222]':
+        - paragraph [ref=e224]: At ten past one the lamp on the desk was the only light left. Past it the aisles went on, patient and unlit, and the clerk understood that the count would not be finished tonight, or by anyone.
+  - region [ref=e225]:
+    - generic [ref=e227]:
+      - generic [ref=e228]:
+        - paragraph [ref=e229]: LIGHTING CONDITIONS
+        - heading "Three ways to read in the dark." [level=2] [ref=e230]
+        - paragraph [ref=e231]:
+          - strong [ref=e232]: Microfilm
+          - text: ": a backlit reader in a quiet records room."
+        - paragraph [ref=e233]:
+          - strong [ref=e234]: Black Lodge
+          - text: ": blue-black night, curtain red, dreamy teal."
+        - paragraph [ref=e235]:
+          - strong [ref=e236]: Cold Case
+          - text: ": sepia, like aged folder stock. Choose your lighting. The reading stays perfect in all three."
+      - generic [ref=e237]:
+        - figure "Microfilm" [ref=e238]:
+          - generic [ref=e240]:
+            - paragraph [ref=e241]: Resumed · ¶ 14
+            - paragraph [ref=e242]: Inventory of the Quiet Floor
+            - paragraph [ref=e243]: The inventory was taken at night, when the building was quiet enough to count. Each drawer was opened, its contents named aloud, and closed again. The clerk wrote in pencil, in case anything needed to be revised.
+        - figure "Black Lodge" [ref=e244]:
+          - generic [ref=e246]:
+            - paragraph [ref=e247]: Resumed · ¶ 14
+            - paragraph [ref=e248]: Inventory of the Quiet Floor
+            - paragraph [ref=e249]: The inventory was taken at night, when the building was quiet enough to count. Each drawer was opened, its contents named aloud, and closed again. The clerk wrote in pencil, in case anything needed to be revised.
+        - figure "Cold Case" [ref=e250]:
+          - generic [ref=e252]:
+            - paragraph [ref=e253]: Resumed · ¶ 14
+            - paragraph [ref=e254]: Inventory of the Quiet Floor
+            - paragraph [ref=e255]: The inventory was taken at night, when the building was quiet enough to count. Each drawer was opened, its contents named aloud, and closed again. The clerk wrote in pencil, in case anything needed to be revised.
+  - region [ref=e256]:
+    - generic [ref=e257]:
+      - generic [ref=e258]:
+        - paragraph [ref=e259]: REQUISITIONS
+        - heading "The archive is free. The armchair is $2.99." [level=2] [ref=e260]
+        - paragraph [ref=e261]: "Reading is free forever: every article, fully attributed, no paywall. If you want the extras, there’s a one-time unlock. No subscription. No ads. No tracking."
+      - generic [ref=e262]:
+        - generic [ref=e263]:
+          - heading "Free — always" [level=3] [ref=e264]
+          - list [ref=e265]:
+            - listitem [ref=e266]:
+              - generic [ref=e269]: Read any article, fully attributed
+            - listitem [ref=e270]:
+              - generic [ref=e273]: Offline saves & your library
+            - listitem [ref=e274]:
+              - generic [ref=e277]: One theme, adjustable text
+            - listitem [ref=e278]:
+              - generic [ref=e281]: Remembers your place
+        - generic [ref=e282]:
+          - heading "Deepwell Pro — one-time $2.99" [level=3] [ref=e283]
+          - paragraph [ref=e284]: (every future Pro feature included)
+          - list [ref=e285]:
+            - listitem [ref=e286]:
+              - generic [ref=e289]: All three themes + full typography controls
+            - listitem [ref=e290]:
+              - generic [ref=e293]: Unlimited offline library
+            - listitem [ref=e294]:
+              - generic [ref=e297]: Sync across devices
+            - listitem [ref=e298]:
+              - generic [ref=e301]: Reading stats & curated paths
+            - listitem [ref=e302]:
+              - generic [ref=e305]: Pay once. Yours forever.
+      - paragraph [ref=e306]: Your clearance is never for sale. We sell the reading experience, never the stories. Every article stays free and credited to its author.
+  - region [ref=e307]:
+    - generic [ref=e309]:
+      - paragraph [ref=e310]: A GUEST IN THE ARCHIVE
+      - heading "Out of character for a moment." [level=2] [ref=e311]
+      - paragraph [ref=e312]:
+        - text: Deepwell is an
+        - strong [ref=e313]: unofficial
+        - text: reader, made by a fan. It is not affiliated with or endorsed by the SCP Wiki. The Foundation, the agents and the clearance levels are the wiki’s shared fiction. The stories belong to the community that wrote them, licensed
+        - strong [ref=e314]: CC BY-SA 3.0
+        - text: ", and every article in Deepwell carries its title, author, a link to the original, and its license. We never sell, gate, or paywall a single story. We’re just here to help you read them."
+      - paragraph [ref=e315]: SCP content is licensed CC BY-SA 3.0. The SCP logo is by Aelanna (CC BY-SA 3.0). Deepwell’s name and logo are its own.
+  - region [ref=e316]:
+    - generic [ref=e317]:
+      - heading "STANDARD QUESTIONS FROM NEW PERSONNEL" [level=2] [ref=e318]
+      - generic [ref=e319]:
+        - generic [ref=e320]:
+          - heading "Is this official?" [level=3] [ref=e321]
+          - paragraph [ref=e322]: No. Deepwell is an unofficial, fan-made reader for the SCP Wiki. It isn’t affiliated with or endorsed by the wiki or its staff.
+        - generic [ref=e323]:
+          - heading "Am I actually a Level 2 agent?" [level=3] [ref=e324]
+          - paragraph [ref=e325]: "Only in spirit. The SCP Foundation is collaborative fiction written by the SCP Wiki community. You don’t need to know any of it to start: open any article and read."
+        - generic [ref=e326]:
+          - heading "Is it really free?" [level=3] [ref=e327]
+          - paragraph [ref=e328]: "Yes. Reading is free forever: every article, no paywall. A one-time $2.99 unlock adds optional extras (more themes, unlimited offline, sync). You never have to pay to read."
+        - generic [ref=e329]:
+          - heading "Are you selling the SCP stories?" [level=3] [ref=e330]
+          - paragraph [ref=e331]: No, and we never will. The content is free and community-owned under CC BY-SA 3.0. Deepwell only charges for software features, such as themes, offline and sync, which sit outside the content.
+        - generic [ref=e332]:
+          - heading "Do the authors get credit?" [level=3] [ref=e333]
+          - paragraph [ref=e334]: Always. Every article shows its author(s), a link to the original on the wiki, and the CC BY-SA 3.0 license. Authors can contact us to change or remove how their work appears.
+        - generic [ref=e335]:
+          - heading "What devices does it work on?" [level=3] [ref=e336]
+          - paragraph [ref=e337]: Deepwell is a web app you can install on iPhone, Android, and desktop — no app store required. It works offline once installed.
+        - generic [ref=e338]:
+          - heading "Does it track me?" [level=3] [ref=e339]
+          - paragraph [ref=e340]: No ads, no trackers, no account required to read. Your reading stays on your device.
+        - generic [ref=e341]:
+          - heading "Can I read offline?" [level=3] [ref=e342]
+          - paragraph [ref=e343]: "Yes. Save articles and read them with no connection: on a plane, underground, anywhere."
+  - region [ref=e344]:
+    - generic [ref=e346]:
+      - paragraph [ref=e347]: END OF ORIENTATION
+      - heading "Go deeper." [level=2] [ref=e348]
+      - paragraph [ref=e349]: Orientation is complete. The archive is not. 19,000+ files remain, catalogued for your comfort. Do sleep afterward.
+      - generic [ref=e351]:
+        - generic [ref=e352]:
+          - generic [ref=e353]:
+            - generic [ref=e354]: Email address
+            - textbox "Email address" [ref=e355]:
+              - /placeholder: you@example.com
+          - generic [ref=e357]:
+            - text: Company
+            - textbox [ref=e358]
+          - button "Join the waitlist" [ref=e359] [cursor=pointer]
+        - paragraph [ref=e360]: We’ll email you once. When it’s ready.
+        - status
+  - generic [ref=e362]:
+    - img "Deepwell — Secure. Contain. Peruse." [ref=e363]:
+      - generic [ref=e372]:
+        - generic [ref=e373]: DEEPWELL
+        - generic [ref=e374]: SECURE · CONTAIN · PERUSE
+    - navigation "Footer" [ref=e375]:
+      - list [ref=e376]:
+        - listitem [ref=e377]:
+          - link "Read" [ref=e378] [cursor=pointer]:
+            - /url: https://app.readdeepwell.com
+        - listitem [ref=e379]:
+          - link "Pricing" [ref=e380] [cursor=pointer]:
+            - /url: "#pricing"
+        - listitem [ref=e381]:
+          - link "Contact" [ref=e382] [cursor=pointer]:
+            - /url: mailto:feedback@readdeepwell.com
+    - paragraph [ref=e383]: An unofficial reader for the SCP Wiki. Not affiliated with or endorsed by the SCP Wiki.
+    - paragraph [ref=e384]: SCP content © its authors, licensed CC BY-SA 3.0. SCP logo by Aelanna, CC BY-SA 3.0. Deepwell name and logo © Deepwell.
+  - generic:
+    - generic [aria-hidden]: ▶ SP 00:19:54 TRACKING ──┼──
+    - group "Atmosphere" [ref=e385]:
+      - generic [aria-hidden] [ref=e386]: Atmosphere
+      - button "Full" [pressed] [ref=e387] [cursor=pointer]
+      - button "Reduced" [ref=e388] [cursor=pointer]
+      - button "Off" [ref=e389] [cursor=pointer]

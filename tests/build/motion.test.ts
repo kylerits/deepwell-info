@@ -4,8 +4,10 @@ import { expect, test } from 'vitest';
 const IDS = ['hero', 'trust', 'problem', 'module-01', 'module-02', 'module-03', 'themes', 'pricing', 'licensing', 'faq', 'final-cta', 'footer'];
 for (const out of ['dist-pilot', 'dist-public']) {
   const html = readFileSync(`${out}/index.html`, 'utf8');
-  test(`${out}: Themes carries its pin wrapper`, () => {
-    expect(html).toMatch(/<section[^>]*class="[^"]*\bsec--pin\b[^"]*"[^>]*id="themes"[\s\S]*?<div class="pin">\s*<div class="wrap">/);
+  for (const id of ['themes', 'module-02']) test(`${out}: ${id} carries its pin wrapper and progress rail`, () => {
+    expect(html).toMatch(new RegExp(`<section[^>]*class="[^"]*\\bsec--pin\\b[^"]*"[^>]*id="${id}"[\\s\\S]*?<div class="pin">\\s*<div class="wrap[ "]`));
+    const sec = html.slice(html.indexOf(`id="${id}"`));
+    expect(sec.slice(0, sec.indexOf('</section>'))).toMatch(/<i class="pin-rail" aria-hidden="true"/);
   });
   test(`${out}: every landing section is a scene, in page order`, () => {
     const roots = [...html.matchAll(/<(section|footer)\b[^>]*>/g)].map((m) => m[0]);

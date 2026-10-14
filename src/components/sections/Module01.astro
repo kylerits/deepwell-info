@@ -15,16 +15,41 @@ import PlainSummary from '../PlainSummary.astro';
       <PlainSummary>Beautiful, faithful typography, with accessibility fonts.</PlainSummary>
     </div>
     <div class="mod__visual">
-      <figure class="reader reader--sm" aria-label="Reading view: Literata with a footnote, and the accessibility typefaces">
+      <figure class="reader reader--sm" data-font="literata" aria-label="Reading view: a passage with a footnote, and a choice of reading typeface">
         <i class="reader__lamp" aria-hidden="true" style="opacity: 0.8"></i>
         <i class="reader__edge" aria-hidden="true" style="opacity: 0.8"></i>
-        <div class="reader__meta"><span>Literata · 18 / 1.7</span><span>68 ch</span></div>
+        <div class="reader__meta"><span><span data-font-name>Literata</span> · 18 / 1.7</span><span>68 ch</span></div>
         <div class="reader__body">
           <p>The inventory was taken at night, when the building was quiet enough to count. Each drawer was opened, its contents named aloud, and closed again. The clerk wrote in pencil, in case anything needed to be revised.<sup>1</sup></p>
         </div>
         <p class="reader__fn">1. Nothing was revised.</p>
-        <div class="reader__chips"><span class="on">Literata</span><span>Atkinson Hyperlegible</span><span>OpenDyslexic</span></div>
+        <div class="reader__chips" role="group" aria-label="Reading typeface">
+          <button type="button" data-font="literata" aria-pressed="true">Literata</button>
+          <button type="button" data-font="atkinson" aria-pressed="false">Atkinson Hyperlegible</button>
+          <button type="button" data-font="opendyslexic" aria-pressed="false">OpenDyslexic</button>
+        </div>
       </figure>
     </div>
   </div>
 </section>
+<script>
+  // The chips are the app's typeface setting in miniature: a pick re-sets this card's passage only.
+  const FAMILY: Record<string, string> = { literata: 'Literata', atkinson: 'Atkinson Hyperlegible', opendyslexic: 'OpenDyslexic' };
+  const fig = document.querySelector<HTMLElement>('#module-01 .reader');
+  const name = fig?.querySelector<HTMLElement>('[data-font-name]');
+  const chips = [...(fig?.querySelectorAll<HTMLButtonElement>('.reader__chips button') ?? [])];
+  const warm = (font: string): void => { void document.fonts?.load(`400 16px "${FAMILY[font]}"`).catch(() => {}); };
+  for (const chip of chips) {
+    const font = chip.dataset.font!;
+    chip.addEventListener('pointerenter', () => warm(font), { once: true });
+    chip.addEventListener('focus', () => warm(font), { once: true });
+    chip.addEventListener('click', () => {
+      if (!fig || fig.dataset.font === font) return;
+      fig.dataset.font = font;
+      for (const c of chips) c.setAttribute('aria-pressed', String(c === chip));
+      if (name) name.textContent = FAMILY[font]!;
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches)
+        for (const el of fig.querySelectorAll('.reader__body, .reader__fn')) el.animate([{ opacity: 0.2 }, { opacity: 1 }], { duration: 220, easing: 'ease-out' });
+    });
+  }
+</script>

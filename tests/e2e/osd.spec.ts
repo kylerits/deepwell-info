@@ -3,18 +3,20 @@ import { open, scrollToFraction } from './helpers';
 
 // Reading text never sits under an overlay (Task 20 review). Runs in both launch states.
 
-test('phone width: the OSD is hidden', async ({ page }) => {
+test('phone width: the OSD rail is hidden', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await open(page, { level: 'full' });
   await expect(page.locator('.osd')).toBeHidden();
+  await expect(page.locator('.rail')).toBeHidden();
 });
 
 for (const [width, height] of [[1440, 900], [1024, 768]] as const)
-  test(`@${width}×${height}: the fixed OSD is shown and never sits over any text, at rest or mid-descent`, async ({ page }) => {
+  test(`@${width}×${height}: the fixed OSD rail (tape and atmosphere switch) is shown and never sits over any text, at rest or mid-descent`, async ({ page }) => {
     await page.setViewportSize({ width, height });
     await open(page, { level: 'full' });
-    const osd = page.locator('.osd');
-    await expect(osd).toBeVisible();
+    await expect(page.locator('.osd')).toBeVisible();
+    await expect(page.locator('.atmo--rail')).toBeVisible();
+    const osd = page.locator('.rail');
     for (const f of [0, 0.25, 0.5, 0.75, 1]) {
       await scrollToFraction(page, f);
       const over = await osd.evaluate((el) => {

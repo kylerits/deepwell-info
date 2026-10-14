@@ -3,7 +3,7 @@ import { Window } from 'happy-dom';
 import { expect, test } from 'vitest';
 
 const w = new Window(); w.document.write(readFileSync('dist-pilot/index.html', 'utf8')); const d = w.document;
-const PLAIN = ['#pricing', '#licensing', '.faq__a', '.summary', '.foot__disc', '.foot__attr', '.cover__attr', '.cover__after', '.cta-row', 'form[data-waitlist]'];
+const PLAIN = ['#pricing', '#licensing', '.faq__a', '.summary', '.foot__disc', '.foot__attr', '.cover__credits', '.cta-row', 'form[data-waitlist]'];
 
 test('plain sections, summaries, CTAs and attribution never carry a recede ramp', () => {
   for (const sel of PLAIN) for (const el of d.querySelectorAll(sel)) {
