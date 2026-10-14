@@ -13,6 +13,9 @@ The site introduces Deepwell while keeping an air of mystery. Visually it echoes
 - `pnpm test`: unit tests (Vitest) · `pnpm test:build`: build-output tests · `pnpm test:e2e`: Playwright (builds pilot and public first)
 - `pnpm check`: Astro typecheck · `pnpm budget`: JS size budget
 - `PUBLIC_LAUNCH_STATE=pilot|public`: the launch switch (build time)
+- `pnpm run deploy`: build pilot, check budget, `wrangler deploy` (Worker `deepwell-info`). Public flip: `PUBLIC_LAUNCH_STATE=public pnpm build && wrangler deploy` (the only change between states).
+- Custom domains `readdeepwell.com` and `www.readdeepwell.com` are attached via the Cloudflare dashboard, not `routes` in `wrangler.jsonc`: the account API token has no zone permissions, same as the app repo.
+- Waitlist: D1 `deepwell-waitlist`, table `waitlist(email, created_at)`; migrations in `migrations/` (`wrangler d1 migrations apply deepwell-waitlist --remote`).
 
 ## The three Deepwell repos
 
