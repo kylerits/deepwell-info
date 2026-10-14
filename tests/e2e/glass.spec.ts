@@ -26,7 +26,8 @@ test('the glass is hidden at 900px and below', async ({ page }) => {
   await expect(page.locator('.tube')).toBeHidden();
 });
 
-const SURFACES = '.cover, .reader, .tcard__page, .osd';
+// The rail is gutter apparatus (the OSD tape and the atmosphere switch beside it), never over the content column.
+const SURFACES = '.cover, .reader, .tcard__page, .rail';
 
 test('coverage: every visible text node on the glass has a .smudge ancestor (Review Focus 1)', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });

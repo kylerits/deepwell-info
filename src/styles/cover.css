@@ -113,19 +113,19 @@
 }
 .cpanel__ring .acs-ico { display: block; width: 24px; height: 24px; }
 
-/* Under the cover: a quiet secondary control into the app, then the attribution. */
-.cover__after { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; margin-top: 22px; }
+/* The way in lives on the cover: an icon-only link at the foot's right (its name is "Read … in Deepwell"),
+   and the licence line links to the original article, so the credits are the whole attribution. */
+.cover__license { justify-self: start; color: var(--ink-soft); text-decoration: underline; text-decoration-color: rgba(234, 223, 198, 0.2); text-underline-offset: 3px; }
+.cover__license:hover { color: var(--ink); text-decoration-color: var(--ink-soft); }
 .cover__read {
-  display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 16px;
-  border: 1px solid #453B54; border-radius: 4px; background: transparent; color: var(--ink);
-  font: 500 14.5px/1 var(--f-ui); text-decoration: none; white-space: nowrap; cursor: pointer;
-  transition: border-color 120ms var(--ease), background-color 120ms var(--ease);
+  flex: none; display: grid; place-items: center; width: 44px; height: 44px;
+  border: 1px solid #453B54; border-radius: 4px; background: transparent; color: var(--ink-soft);
+  transition: border-color 120ms var(--ease), color 120ms var(--ease), background-color 120ms var(--ease);
 }
-.cover__read svg { flex: none; color: var(--ink-soft); }
-.cover__read:hover { border-color: var(--ink-soft); background: rgba(234, 223, 198, 0.04); }
-.cover__attr { margin: 0; font: 400 12.5px/1.6 var(--f-type); letter-spacing: 0.03em; color: var(--ink-soft); text-wrap: pretty; }
-.cover__attr a { color: var(--ink); text-decoration: underline; text-decoration-color: rgba(234, 223, 198, 0.35); text-underline-offset: 3px; }
-.cover__attr a:hover { text-decoration-color: var(--ink); }
+.cover__read svg { transition: translate 160ms var(--ease); }
+.cover__read:hover { border-color: var(--ink-soft); color: var(--ink); background: rgba(234, 223, 198, 0.04); }
+.cover__read:hover svg { translate: 2px 0; }
+@media (prefers-reduced-motion: reduce) { .cover__read svg { transition: none; } .cover__read:hover svg { translate: none; } }
 
 @media (max-width: 560px) {
   .cover__page { min-height: 500px; padding: 26px 24px 24px; }

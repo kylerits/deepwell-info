@@ -278,26 +278,63 @@ test('final CTA: on approach it is far off and out of focus; calm never blurs it
   await page.waitForTimeout(1500);
   expect((await styleOf(page, '.h-deep')).filter).toBe('none');
 });
-test('module 02: the bar fills with scroll, rests at its shipped width, and runs back', async ({ page }) => {
+/** Scroll to fraction `p` of a pinned section's pin range (its top at the screen top → its bottom at the screen bottom). */
+const scrollPinTo = (page: Page, sel: string, p: number) => page.evaluate(([s, f]) => {
+  const el = document.querySelector<HTMLElement>(s as string)!; const top = el.getBoundingClientRect().top + scrollY;
+  scrollTo(0, top + (el.offsetHeight - innerHeight) * (f as number));
+}, [sel, p] as const);
+const m2 = (page: Page) => page.evaluate(() => {
+  const s = document.querySelector<HTMLElement>('#module-02')!; const op = (q: string) => Number(getComputedStyle(s.querySelector(q)!).opacity);
+  return { steps: [...s.querySelectorAll('.steps li')].map((l) => Number(getComputedStyle(l).opacity)), saved: op('.fieldcard__saved'), nosig: op('.fieldcard__nosig'), here: op('.reader__para--here'), pinP: s.style.getPropertyValue('--pin-p') };
+});
+test('module 02: pins and walks Save → Lose signal → Resume, then rests at the shipped DOM', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await open(page);
-  const scaleX = () => page.locator('#module-02 .reader__prog i').evaluate((e) => { const m = getComputedStyle(e).transform; return m === 'none' ? 1 : Number(m.slice(7).split(',')[0]); });
-  await scrollSectionTo(page, '#module-02', 0.75);
+  const sec = page.locator('#module-02');
+  expect(await sec.getAttribute('data-pin')).toBeNull();
+  expect(await sec.evaluate((e) => e.getBoundingClientRect().height / innerHeight)).toBeGreaterThan(2.8 - 0.01);
+  await scrollPinTo(page, '#module-02', 0.2);
   await page.waitForTimeout(1200);
-  const mid = await scaleX();
-  expect(mid).toBeGreaterThan(0); expect(mid).toBeLessThan(1);
-  await scrollSectionTo(page, '#module-02', 0.1);
-  await page.waitForTimeout(2500);
-  expect(await page.locator('#module-02 .reader__prog i').getAttribute('style')).toBeNull();
-  expect(await page.locator('#module-02 .reader__mark').getAttribute('style')).toBeNull();
-  await scrollSectionTo(page, '#module-02', 0.75);
+  expect(Math.round(await page.locator('#module-02 .pin').evaluate((e) => e.getBoundingClientRect().top))).toBe(0);
+  let st = await m2(page);
+  expect(st.steps[1]).toBeLessThan(0.5); expect(st.steps[2]).toBeLessThan(0.5);
+  expect(st.saved).toBeLessThan(0.5); expect(st.nosig).toBeLessThan(0.5); expect(st.here).toBeLessThan(0.5);
+  await scrollPinTo(page, '#module-02', 0.55);
   await page.waitForTimeout(1200);
-  expect(await scaleX()).toBeLessThan(1);
+  st = await m2(page);
+  expect(st.steps[1]).toBe(1); expect(st.steps[2]).toBeLessThan(0.5);
+  expect(st.saved).toBe(1); expect(st.nosig).toBe(1); expect(st.here).toBeLessThan(0.5);
+  await scrollPinTo(page, '#module-02', 1.05);
+  await page.waitForTimeout(1500);
+  st = await m2(page);
+  expect(st.steps).toEqual([1, 1, 1]); expect(st.here).toBe(1); expect(st.pinP).toBe('');
+  expect(await page.locator('#module-02 .fieldcard [style]:not(.reader__lamp, .reader__edge)').count()).toBe(0);
+  expect(await page.locator('#module-02 .steps [style]').count()).toBe(0);
+  expect(await backdropRoots(page)).toEqual([]);
+});
+test('pin progress: the right-gutter rail fills with each pin and shows only while pinned', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await open(page);
+  for (const sel of ['#module-02', '#themes']) {
+    const seen: number[] = [];
+    for (const p of [0.1, 0.4, 0.7, 0.95]) {
+      await scrollPinTo(page, sel, p);
+      await page.waitForTimeout(900);
+      seen.push(Number(await page.locator(sel).evaluate((e) => e.style.getPropertyValue('--pin-p'))));
+      await expect(page.locator(`${sel} .pin-rail`)).toBeVisible();
+    }
+    expect(seen, sel).toEqual([...seen].sort((x, y) => x - y));
+    expect(seen[0]!).toBeGreaterThan(0); expect(seen[3]!).toBeLessThan(1);
+  }
+  await page.setViewportSize({ width: 1440, height: 600 }); // neither pin fits: no rail
+  await expect(page.locator('#themes')).toHaveAttribute('data-pin', 'off');
+  await expect(page.locator('#module-02 .pin-rail')).toBeHidden();
+  await expect(page.locator('#themes .pin-rail')).toBeHidden();
 });
 test('module 02: arriving pulses the \u00b6 14 mark in lamp amber', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await open(page);
-  await scrollSectionTo(page, '#module-02', 0.75);
+  await scrollPinTo(page, '#module-02', 0.8);
   await page.waitForTimeout(1200);
   // Sample the computed color every frame across the pulse; some frame must be well toward lamp amber
   // (#C98A3B, red 201) from the resting teal (red channel far lower).
@@ -316,8 +353,8 @@ test('module 02: arriving pulses the \u00b6 14 mark in lamp amber', async ({ pag
       if (d < min) { min = d; at = c; }
       if (performance.now() - t0 > 1800) res(at); else requestAnimationFrame(tick);
     };
-    const s = document.querySelector('#module-02')!;
-    scrollTo(0, s.getBoundingClientRect().top + scrollY - innerHeight * 0.2);
+    const s = document.querySelector<HTMLElement>('#module-02')!;
+    scrollTo(0, s.getBoundingClientRect().top + scrollY + s.offsetHeight - innerHeight + 40); // past the pin's end
     tick();
   }));
   expect(best, 'computed color must be rgb()').toMatch(/^rgba?\(/);
@@ -352,11 +389,11 @@ test('themes: a pin taller than the screen is not pinned (Review Focus 1)', asyn
   await scrollSectionTo(page, '#themes', 0.5); // the entrance still plays
   await expect(page.locator('#themes')).toHaveAttribute('data-scene-done', '', { timeout: 10_000 });
 });
-test('themes: calm and narrow never pin', async ({ page }) => {
+test('themes and module 02: calm and narrow never pin', async ({ page }) => {
   for (const [level, width] of [['reduced', 1440], ['full', 390]] as const) {
     await page.setViewportSize({ width, height: 900 });
     await open(page, { level });
-    expect(await page.locator('#themes .pin').evaluate((e) => getComputedStyle(e).position)).toBe('static');
+    for (const id of ['#themes', '#module-02']) expect(await page.locator(`${id} .pin`).evaluate((e) => getComputedStyle(e).position)).toBe('static');
   }
 });
 test('a hold jumps every scrub to rest (final CTA, Module 02, Themes)', async ({ page }) => {
@@ -366,7 +403,7 @@ test('a hold jumps every scrub to rest (final CTA, Module 02, Themes)', async ({
     await scrollSectionTo(page, '#start', 0.85);
     await page.waitForTimeout(1200);
     expect((await styleOf(page, '.h-deep')).filter).toMatch(/blur/);
-    await scrollSectionTo(page, '#module-02', 0.75);
+    await scrollPinTo(page, '#module-02', 0.5);
     await page.waitForTimeout(1200);
     expect(await page.locator('#module-02 .reader__prog i').getAttribute('style')).not.toBeNull();
     await page.evaluate(() => { const s = document.querySelector('#themes')!; scrollTo(0, s.getBoundingClientRect().top + scrollY + innerHeight * 0.9); });
@@ -374,6 +411,7 @@ test('a hold jumps every scrub to rest (final CTA, Module 02, Themes)', async ({
     expect(await page.locator('#themes .tcard[style]').count()).toBeGreaterThan(0);
     await setHidden(page, true);
     expect(await page.locator('#module-02 .reader__prog i').getAttribute('style')).toBeNull();
+    expect(await page.locator('#module-02').getAttribute('style')).toBeNull(); // --pin-p is gone at rest
     expect(await page.locator('#themes .tcard[style], #themes .tcard__label[style]').count()).toBe(0);
     await scrollSectionTo(page, '#start', 0.85);
     await page.waitForTimeout(600);

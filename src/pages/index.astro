@@ -15,6 +15,7 @@ import Licensing from '../components/sections/Licensing.astro';
 import Faq from '../components/sections/Faq.astro';
 import FinalCta from '../components/sections/FinalCta.astro';
 import Footer from '../components/sections/Footer.astro';
+import AtmosphereSwitch from '../components/AtmosphereSwitch.svelte';
 import '../styles/motion.css';
 ---
 <Base coverSlugs={COVER_SLUGS} motion>
@@ -23,7 +24,10 @@ import '../styles/motion.css';
     <Field client:idle />
     <div class="tube" aria-hidden="true"></div>
     <Hero /><TrustStrip /><Problem /><Module01 /><Module02 /><Module03 /><Themes /><Pricing /><Licensing /><Faq /><FinalCta /><Footer />
-    <div class="osd" aria-hidden="true">▶ SP <span data-osd-time>00:14:07</span>   TRACKING ──┼──</div>
+    <div class="rail">
+      <div class="osd" aria-hidden="true">▶ SP <span data-osd-time>00:14:07</span>   TRACKING ──┼──</div>
+      <AtmosphereSwitch variant="rail" client:load />
+    </div>
   </main>
 </Base>
 <script>

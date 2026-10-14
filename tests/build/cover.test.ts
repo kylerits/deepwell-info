@@ -13,15 +13,18 @@ for (const out of ['dist-pilot', 'dist-public']) describe(`${out}: hero cover`, 
     expect(doc.querySelectorAll('.cover-slot[data-default]')).toHaveLength(1);
     expect(doc.querySelector('.cover-slot[data-default]')!.getAttribute('data-slug')).toBe('scp-173');
   });
-  test('every slot: button to /read/<slug>, attribution linking the wiki, never gated', () => {
+  test('every slot: the way in and the attribution live on the cover, never gated', () => {
     for (const e of COVER_POOL) {
       const s = doc.querySelector(`.cover-slot[data-slug="${e.slug}"]`)!;
-      const read = s.querySelector('a.cover__read')!;
+      const read = s.querySelector('.cover__foot a.cover__read')!;
       expect(read.getAttribute('href')).toBe(`https://app.readdeepwell.com/read/${e.slug}`);
-      expect(read.textContent!.trim()).toBe(`Read ${e.title} in Deepwell`);
-      const attr = s.querySelector('.cover__attr')!;
-      expect(attr.querySelector('a')!.getAttribute('href')).toBe(e.url);
-      expect(attr.textContent).toMatch(/ by .+ · SCP Wiki · CC BY-SA 3\.0$/);
+      expect(read.getAttribute('aria-label')).toBe(`Read ${e.title} in Deepwell`);
+      const lic = s.querySelector('.cover__credits a.cover__license')!;
+      expect(lic.getAttribute('href')).toBe(e.url);
+      expect(lic.textContent!.trim()).toBe('CC BY-SA 3.0 · SCP Wiki');
+      expect(lic.getAttribute('title')).toMatch(/^“.+” by .+ · SCP Wiki · CC BY-SA 3\.0$/);
+      expect(s.querySelector('.cover__byline')!.textContent).toContain(e.authors.join(', '));
+      expect(s.querySelector('.cover__after, .cover__attr')).toBeNull();
     }
   });
   test('no ids inside slots (ten copies must not collide)', () => {

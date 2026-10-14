@@ -5,9 +5,10 @@ import WaitlistForm from '../WaitlistForm.astro';
 import Logo from '../brand/Logo.astro';
 import PlainSummary from '../PlainSummary.astro';
 import CoverSlots from '../cover/CoverSlots.astro';
+import AtmosphereSwitch from '../AtmosphereSwitch.svelte';
 ---
 <section class="sec sec--hero" id="top" aria-labelledby="hero-h1" data-depth="0" data-scene="hero">
-  <header class="wrap top"><a class="top__logo smudge" href="#top" aria-label="Deepwell"><Logo decorative /></a></header>
+  <header class="wrap top"><a class="top__logo smudge" href="#top" aria-label="Deepwell"><Logo decorative /></a><AtmosphereSwitch variant="top" client:load /></header>
   <div class="wrap hero__grid hero__grid--cover">
     <div class="col smudge">
       <p class="eyebrow">ORIENTATION PACKET · FIELD PERSONNEL, LEVEL 2</p>

@@ -5,22 +5,15 @@ import { createTimeline, stagger } from 'animejs';
 import type { Timeline } from 'animejs';
 import { pinRange } from '../progress';
 import { snapshot } from '../snapshot';
-import { docTop, type Scene } from './types';
-
-/** The pin's `padding-block: 48px` top and bottom (motion.css, `.sec--pin > .pin`). Keep the two in step. */
-const PIN_PAD = 96;
+import { docTop, fitPin, setPinProgress, type Scene } from './types';
 
 export const themes: Scene = {
   owns: ['.tcard'],
   mount(section) {
-    const pin = section.querySelector<HTMLElement>('.pin');
-    const wrap = pin?.querySelector<HTMLElement>('.wrap');
     const cards = [...section.querySelectorAll<HTMLElement>('.tcard')];
     const captions = cards.map((c) => c.querySelector<HTMLElement>('.tcard__label'));
-    if (!pin || !wrap || cards.length !== 3 || captions.some((c) => !c)) return null;
-    section.removeAttribute('data-pin');
-    // The pin is a screen of sticky content: if it would not fit, leave the section as a normal one.
-    if (wrap.getBoundingClientRect().height + PIN_PAD > innerHeight) { section.setAttribute('data-pin', 'off'); return null; }
+    if (cards.length !== 3 || captions.some((c) => !c)) return null;
+    if (!fitPin(section)) return null;
     const snap = snapshot([...cards, ...(captions as HTMLElement[])]);
     let tl: Timeline | null = null;
     const build = (): Timeline => { // measured at rest: the row is the real layout
@@ -43,11 +36,12 @@ export const themes: Scene = {
     return {
       range: () => pinRange({ top: docTop(section), height: section.offsetHeight, vh: innerHeight }),
       scrub(p) {
+        setPinProgress(section, p);
         if (p >= 1) { if (tl) { tl.cancel(); tl = null; snap.restore(); } return; }
         tl ??= build();
         tl.seek(p * tl.duration);
       },
-      destroy() { tl?.cancel(); tl = null; snap.restore(); section.removeAttribute('data-pin'); },
+      destroy() { tl?.cancel(); tl = null; snap.restore(); setPinProgress(section, null); section.removeAttribute('data-pin'); },
     };
   },
 };

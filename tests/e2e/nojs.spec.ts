@@ -8,7 +8,8 @@ test('JS off: copy, the CTA and exactly one cover still render', async ({ page }
   else await expect(page.getByRole('link', { name: 'Start reading — free' }).first()).toBeVisible();
   const visible = await page.locator('.cover-slot').evaluateAll((els) => els.filter((e) => getComputedStyle(e).display !== 'none').length);
   expect(visible).toBe(1);
-  await expect(page.locator('.atmo')).toBeHidden();
+  await expect(page.locator('.atmo')).toHaveCount(3); // rail, hero top row, footer: all need JS
+  await expect(page.locator('.atmo:visible')).toHaveCount(0);
   await expect(page.locator('[data-osd-time]')).toHaveText('00:14:07');
 });
 test('JS off: a failed waitlist post lands on the plain error page with a retry form', async ({ page }, info) => {

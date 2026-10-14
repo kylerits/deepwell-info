@@ -18,8 +18,23 @@ html[data-motion-arm] :is(#top .col > :not(h1), #top .hero__visual > *) { opacit
    only, and only when the content fits the screen (the scene sets data-pin="off" otherwise). Sticky is not
    a backdrop root, so the smudges inside keep their blur. */
 @media (min-width: 901px) {
-  html[data-motion="full"] .sec--pin:not([data-pin="off"]) { height: 320vh; padding-block: 0; }
+  html[data-motion="full"] .sec--pin:not([data-pin="off"]) { height: calc(100vh + var(--pin-len, 220vh)); padding-block: 0; }
   html[data-motion="full"] .sec--pin:not([data-pin="off"]) > .pin {
     position: sticky; top: 0; min-height: 100vh; display: grid; align-content: center; padding-block: 48px;
   }
+}
+/* Module 02's pin is shorter: three steps, not four beats. */
+#module-02 { --pin-len: 180vh; }
+
+/* Pin progress (the scroll is held, so say how far through it you are): a hairline rail in the right gutter,
+   mirroring the OSD on the left. It lives in the sticky screen, so it arrives and leaves with the pin.
+   Scenes set --pin-p while pinned; at rest the property is gone and the rail reads full. */
+.pin-rail { display: none; }
+@media (min-width: 901px) {
+  html[data-motion="full"] .sec--pin:not([data-pin="off"]) .pin-rail {
+    display: block; position: absolute; right: calc(var(--gut) / 2); top: 32vh; height: 36vh; width: 1px;
+    background: rgba(234, 223, 198, 0.12); pointer-events: none;
+  }
+  .pin-rail > i { position: absolute; inset: 0; background: var(--teal); opacity: 0.8; transform-origin: 50% 0; transform: scaleY(var(--pin-p, 1)); }
+  .pin-rail > b { position: absolute; left: -2px; width: 5px; height: 1px; top: calc(var(--at) * 100%); background: rgba(162, 151, 126, 0.4); }
 }

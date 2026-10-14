@@ -109,7 +109,7 @@ body { margin: 0; }
 /* Sections take focus programmatically when an anchor glide lands on them (smooth.ts); that is not a control. */
 section[tabindex="-1"]:focus, section[tabindex="-1"]:focus-visible { outline: none; }
 .btn:focus-visible, .atmo-btn:focus-visible, .foot a:focus-visible, .top__logo:focus-visible,
-.cover__read:focus-visible, .cover__attr a:focus-visible {
+.cover__read:focus-visible, .cover__license:focus-visible, .reader__chips button:focus-visible {
   outline: 2px solid var(--teal); outline-offset: 3px;
 }
 
@@ -149,13 +149,42 @@ section[tabindex="-1"]:focus, section[tabindex="-1"]:focus-visible { outline: no
   font-family: var(--f-read); font-size: 13.5px; line-height: 1.6; color: var(--ink-soft);
   border-top: 1px solid var(--line); padding-top: 12px; margin: 18px 0 0;
 }
-.reader__chips { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 22px 0 0; font: 500 12.5px/1.6 var(--f-ui); color: var(--ink-soft); }
-.reader__chips .on { color: var(--ink); text-decoration: underline; text-decoration-color: var(--teal); text-decoration-thickness: 1.5px; text-underline-offset: 6px; }
+.reader__chips { display: flex; flex-wrap: wrap; gap: 0 18px; margin: 12px 0 0; }
+.reader__chips button {
+  appearance: none; background: none; border: 0; padding: 0 2px; min-height: 40px; cursor: pointer;
+  font: 500 12.5px/1.6 var(--f-ui); color: var(--ink-soft); transition: color 120ms var(--ease);
+}
+.reader__chips button:hover { color: var(--ink); }
+.reader__chips button[aria-pressed="true"] { color: var(--ink); text-decoration: underline; text-decoration-color: var(--teal); text-decoration-thickness: 1.5px; text-underline-offset: 6px; }
+html:not([data-js]) .reader__chips button { pointer-events: none; }   /* the demo needs JS; without it the chips are a plain list */
+/* The typeface demo re-sets this card's passage only, never the page. */
+.reader[data-font="atkinson"] :is(.reader__body, .reader__fn) { font-family: "Atkinson Hyperlegible", var(--f-read); }
+.reader[data-font="opendyslexic"] :is(.reader__body, .reader__fn) { font-family: "OpenDyslexic", var(--f-read); }
 .reader__prog { height: 2px; background: #2A2333; margin: 0 0 24px; }
-.reader__prog i { display: block; height: 100%; width: 38%; background: var(--teal); }
+.reader__prog i { display: block; height: 100%; width: 100%; background: var(--teal); }
 .reader__para { position: relative; }
 .reader__mark {
-  position: absolute; left: -24px; top: 0.35em; font-family: var(--f-type); font-size: 10.5px; letter-spacing: 0.06em; color: var(--teal);
+  display: block; margin: 0 0 6px; font-family: var(--f-type); font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--teal);
+}
+
+/* Module 02: Save → Lose signal → Resume. This is the rest state, every step done; the module-02 scene
+   walks it from the start when motion is full. */
+.steps { list-style: none; display: flex; flex-wrap: wrap; gap: 6px 22px; margin: 0 0 18px; padding: 0; font-family: var(--f-type); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink); }
+.steps li { display: inline-flex; gap: 8px; }
+.steps__n { color: var(--teal); }
+.fieldcard .reader__meta { flex-wrap: wrap; row-gap: 8px; margin-bottom: 18px; }
+.fieldcard__swap { white-space: nowrap; }
+.fieldcard__save, .fieldcard__signal { display: inline-flex; align-items: center; gap: 8px; }
+.reader__meta .fieldcard__swap { display: inline-grid; }
+.reader__meta .fieldcard__swap > span { display: block; grid-area: 1 / 1; }
+.fieldcard__saving { opacity: 0; }
+.fieldcard__bar { opacity: 0.22; }
+.fieldcard .reader__prog i { opacity: 0.45; }
+.reader__para--read { opacity: 0.35; margin-bottom: 18px; }
+.reader__para--here { padding-left: 16px; }
+.reader__rule {
+  position: absolute; left: 0; top: 2px; bottom: 4px; width: 2px; transform-origin: 50% 0;
+  background: linear-gradient(to bottom, rgba(238, 178, 92, 0.9), rgba(217, 151, 63, 0.35));
 }
 
 /* Problem: reserved slot for the 3D logo emergence (to plan). A flat, static stand-in of the Stack
@@ -239,6 +268,18 @@ section[tabindex="-1"]:focus, section[tabindex="-1"]:focus-visible { outline: no
   color: var(--ink); text-decoration: underline; text-decoration-color: var(--teal);
   text-decoration-thickness: 1.5px; text-underline-offset: 7px;
 }
+/* One switch per place: the gutter rail from 561px up (atmosphere.css, .rail), the hero's top row and the footer on phones. */
+.atmo--top, .atmo--foot { display: none; }
+.atmo--rail { pointer-events: auto; flex-wrap: nowrap; gap: 0 10px; margin: 0; }
+.atmo--rail .atmo__label { font-size: 11px; margin: 0 4px 0 0; }
+.atmo--rail .atmo-btn { min-height: 0; padding: 6px 9px; font-size: 13px; }
+.atmo--rail .atmo-btn[aria-pressed="true"] { text-underline-offset: 5px; }
+@media (max-height: 719px) { .atmo--rail .atmo__label { display: none; } }
+.top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 24px; }
+@media (max-width: 560px) {
+  .atmo--top, .atmo--foot { display: flex; }
+  .atmo--top { margin: 0; gap: 0 14px; }
+}
 html:not([data-js]) .atmo { display: none; }   /* the atmosphere switch needs JS */
 
 /* Phone */
@@ -254,6 +295,5 @@ html:not([data-js]) .atmo { display: none; }   /* the atmosphere switch needs JS
   .top { padding-top: 24px; }
   .logo { width: 176px; }
   .reader__title { font-size: 23px; }
-  .reader__mark { position: static; display: block; margin: 0 0 4px; }
   .h-deep { letter-spacing: -0.02em; }
 }
