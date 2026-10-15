@@ -11,3 +11,4 @@ Binary or third-party files copied verbatim. Re-vendor from the source; don't ed
 | public/fonts/OpenDyslexic-Regular.woff2, opendyslexic-OFL.txt | same | 2026-10-14 | SIL OFL 1.1 |
 | public/atmos/grain.png | ~/projects/Deepwell/design/marketing_site/handoff/reference/grain.png | 2026-10-08 | Deepwell |
 | public/favicon.svg | ~/projects/Deepwell/design/brand/logo/app-icon.svg | 2026-10-08 | Deepwell |
+| public/apple-touch-icon.png, public/icon-512.png | rasterised from public/favicon.svg (the vendored app-icon.svg) by `pnpm og` | 2026-10-14 | Deepwell |

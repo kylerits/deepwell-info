@@ -5,7 +5,7 @@ import FieldStatic from './FieldStatic.astro';
 interface Props { title: string; path: string }
 const { title, path } = Astro.props;
 ---
-<Base title={title} path={path}>
+<Base title={title} path={path} noindex>
   <main class="dw">
     <FieldStatic />
     <section class="sec">

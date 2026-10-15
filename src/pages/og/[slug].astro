@@ -1,0 +1,67 @@
+---
+// The 1200×630 share card, rendered by scripts/gen-og.mjs and screenshotted to public/og/.
+// Built only when OG_RENDER=1, so pilot/public builds never ship this route.
+import '../../styles/tokens.css';
+import '../../styles/acs-tokens.css';
+import '../../styles/fonts.css';
+import '../../styles/site.css';
+import '../../styles/cover.css';
+import '../../styles/atmosphere.css';
+import Logo from '../../components/brand/Logo.astro';
+import Cover from '../../components/cover/Cover.astro';
+import FieldStatic from '../../components/FieldStatic.astro';
+import { COVER_POOL, type PoolEntry } from '../../lib/cover/pool';
+import { coverModel } from '../../lib/cover/cover-model';
+import { BUILD_DEFAULT } from '../../lib/atmosphere/level';
+
+export function getStaticPaths() {
+  if (process.env.OG_RENDER !== '1') return [];
+  return COVER_POOL.map((entry) => ({ params: { slug: entry.slug }, props: { entry } }));
+}
+const { entry } = Astro.props as { entry: PoolEntry };
+const m = coverModel(entry);
+---
+<!doctype html>
+<html lang="en" data-theme="dark" data-atmosphere={BUILD_DEFAULT}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex" />
+    <title>Share card — {m.name}</title>
+  </head>
+  <body>
+    <main class="og">
+      <FieldStatic />
+      <div class="og__brand">
+        <Logo />
+        <p class="og__subtitle">An unofficial reader for the SCP Wiki</p>
+        <p class="og__line">Every article, beautifully set. Offline, no ads, no tracking.</p>
+        <p class="og__meta">readdeepwell.com · Free to read</p>
+        <p class="og__credit">{m.quoted}{m.attributionTail}</p>
+      </div>
+      <div class="og__cover"><Cover m={m} /></div>
+    </main>
+  </body>
+</html>
+<style is:global>
+  html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; background: #131019; }
+  .og { position: relative; width: 1200px; height: 630px; overflow: hidden; isolation: isolate; }
+  .og .field-static, .og ~ .vignette { position: absolute; }
+  .og__brand {
+    position: absolute; left: 72px; top: 0; bottom: 0; width: 520px;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .og__brand .logo { width: 430px; height: auto; margin: 0 0 40px -4px; }
+  .og__subtitle { font: 600 29px/1.25 var(--f-ui); color: var(--ink); margin: 0 0 16px; white-space: nowrap; }
+  .og__line { font: 400 21px/1.5 var(--f-ui); color: var(--ink-soft); margin: 0 0 36px; max-width: 24em; }
+  .og__meta { font: 400 16px/1 var(--f-type); letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink); margin: 0; }
+  .og__credit {
+    position: absolute; left: 0; bottom: 34px; margin: 0;
+    font: 400 12px/1.4 var(--f-type); letter-spacing: 0.06em; color: var(--ink-soft); white-space: nowrap;
+  }
+  /* The cover bleeds off the bottom: the page recedes rather than ends. */
+  .og__cover {
+    position: absolute; right: 72px; top: 84px; width: 470px;
+    -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 62%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 0, #000 62%, transparent 100%);
+  }
+</style>

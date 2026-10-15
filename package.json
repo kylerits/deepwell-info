@@ -17,7 +17,8 @@
     "test:e2e": "pnpm build:pilot && pnpm build:public && playwright test",
     "budget": "node scripts/check-budget.mjs dist",
     "cover:pool": "node scripts/gen-cover-pool.mjs",
-    "deploy": "PUBLIC_LAUNCH_STATE=pilot astro build && pnpm budget && wrangler deploy"
+    "deploy": "PUBLIC_LAUNCH_STATE=pilot astro build && pnpm budget && wrangler deploy",
+    "og": "node scripts/gen-og.mjs"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",

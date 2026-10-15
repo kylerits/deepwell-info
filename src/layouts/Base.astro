@@ -7,15 +7,25 @@ import '../styles/cover.css';
 import '../styles/atmosphere.css';
 import { bootScript } from '../lib/boot';
 import { ATMOSPHERE_STORAGE_KEY, BUILD_DEFAULT } from '../lib/atmosphere/level';
-interface Props { title?: string; description?: string; path?: string; coverSlugs?: readonly string[]; motion?: boolean }
+import { OG_IMAGE, OG_IMAGE_ALT } from '../lib/seo';
+interface Props {
+  title?: string; description?: string; path?: string; coverSlugs?: readonly string[]; motion?: boolean;
+  ogTitle?: string; ogDescription?: string; ogImage?: string; ogImageAlt?: string; noindex?: boolean;
+}
 const {
   title = 'Deepwell — A cozy reader for the SCP Wiki',
   description = 'Read the SCP Wiki the way it deserves — offline, distraction-free, beautifully set. 19,000+ anomalies, three themes, always free to read. An unofficial reader.',
   path = '/',
   coverSlugs = [],
   motion = false,
+  ogTitle = 'Deepwell — a terminal into the archive',
+  ogDescription = 'A typography-first, offline reader for the SCP Wiki. Free to read, no ads, no tracking. Secure. Contain. Peruse.',
+  ogImage = OG_IMAGE,
+  ogImageAlt = OG_IMAGE_ALT,
+  noindex = false,
 } = Astro.props;
 const canonical = new URL(path, Astro.site).href;
+const image = new URL(ogImage, Astro.site).href;
 ---
 <!doctype html>
 <html lang="en" data-theme="dark" data-atmosphere={BUILD_DEFAULT}>
@@ -25,18 +35,33 @@ const canonical = new URL(path, Astro.site).href;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
     <link rel="canonical" href={canonical} />
     <meta name="theme-color" content="#131019" />
     <meta name="color-scheme" content="dark" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="preload" href="/fonts/literata-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin />
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Deepwell" />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:url" content={canonical} />
-    <meta property="og:title" content="Deepwell — a terminal into the archive" />
-    <meta property="og:description" content="A typography-first, offline reader for the SCP Wiki. Free to read, no ads, no tracking. Secure. Contain. Peruse." />
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="Deepwell — a terminal into the archive" />
-    <meta name="twitter:description" content="A typography-first, offline reader for the SCP Wiki. Free to read, no ads, no tracking. Secure. Contain. Peruse." />
+    <meta property="og:title" content={ogTitle} />
+    <meta property="og:description" content={ogDescription} />
+    <meta property="og:image" content={image} />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={ogImageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={ogTitle} />
+    <meta name="twitter:description" content={ogDescription} />
+    <meta name="twitter:image" content={image} />
+    <meta name="twitter:image:alt" content={ogImageAlt} />
+    <meta name="twitter:label1" content="Price" />
+    <meta name="twitter:data1" content="Free to read" />
+    <meta name="twitter:label2" content="Works" />
+    <meta name="twitter:data2" content="In your browser, offline" />
     <slot name="head" />
   </head>
   <body><slot /></body>
