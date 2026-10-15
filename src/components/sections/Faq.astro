@@ -1,15 +1,11 @@
+---
+import { FAQ } from '../../data/faq';
+---
 <section class="sec" id="faq" aria-labelledby="faq-h" data-depth="0.82" data-scene="faq">
 <div class="wrap smudge">
 <h2 class="eyebrow" id="faq-h">STANDARD QUESTIONS FROM NEW PERSONNEL</h2>
 <div class="faq">
-<div class="faq__item"><h3 class="faq__q">Is this official?</h3><p class="faq__a">No. Deepwell is an unofficial, fan-made reader for the SCP Wiki. It isn’t affiliated with or endorsed by the wiki or its staff.</p></div>
-<div class="faq__item"><h3 class="faq__q">Am I actually a Level 2 agent?</h3><p class="faq__a">Only in spirit. The SCP Foundation is collaborative fiction written by the SCP Wiki community. You don’t need to know any of it to start: open any article and read.</p></div>
-<div class="faq__item"><h3 class="faq__q">Is it really free?</h3><p class="faq__a">Yes. Reading is free forever: every article, no paywall. A one-time $2.99 unlock adds optional extras (more themes, unlimited offline, sync). You never have to pay to read.</p></div>
-<div class="faq__item"><h3 class="faq__q">Are you selling the SCP stories?</h3><p class="faq__a">No, and we never will. The content is free and community-owned under CC BY-SA 3.0. Deepwell only charges for software features, such as themes, offline and sync, which sit outside the content.</p></div>
-<div class="faq__item"><h3 class="faq__q">Do the authors get credit?</h3><p class="faq__a">Always. Every article shows its author(s), a link to the original on the wiki, and the CC BY-SA 3.0 license. Authors can contact us to change or remove how their work appears.</p></div>
-<div class="faq__item"><h3 class="faq__q">What devices does it work on?</h3><p class="faq__a">Deepwell is a web app you can install on iPhone, Android, and desktop — no app store required. It works offline once installed.</p></div>
-<div class="faq__item"><h3 class="faq__q">Does it track me?</h3><p class="faq__a">No ads, no trackers, no account required to read. Your reading stays on your device.</p></div>
-<div class="faq__item"><h3 class="faq__q">Can I read offline?</h3><p class="faq__a">Yes. Save articles and read them with no connection: on a plane, underground, anywhere.</p></div>
+{FAQ.map(({ q, a }) => <div class="faq__item"><h3 class="faq__q">{q}</h3><p class="faq__a">{a}</p></div>)}
 </div>
 </div>
 </section>

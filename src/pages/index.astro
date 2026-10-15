@@ -17,8 +17,12 @@ import FinalCta from '../components/sections/FinalCta.astro';
 import Footer from '../components/sections/Footer.astro';
 import AtmosphereSwitch from '../components/AtmosphereSwitch.svelte';
 import '../styles/motion.css';
+import { FAQ } from '../data/faq';
+import { siteJsonLd } from '../lib/seo';
+const jsonLd = siteJsonLd(Astro.site!, FAQ);
 ---
 <Base coverSlugs={COVER_SLUGS} motion>
+  <script slot="head" type="application/ld+json" is:inline set:html={jsonLd} />
   <main class="dw">
     <FieldStatic descent />
     <Field client:idle />
