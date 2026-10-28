@@ -1,5 +1,7 @@
 // landing-page.md §11 waitlist confirmation (verbatim).
 export const WAITLIST_CONFIRMATION = 'Noted. Your name is in the personnel file. We’ll be in touch exactly once, when your access is ready.';
+// landing-page.md §11 waitlist privacy line (verbatim; KYL-80). Notice at the point of collection.
+export const WAITLIST_PRIVACY = 'We keep only your email, to send your invite, then delete it.';
 // NOT in landing-page.md: plan Decision 3, pending Kyle's approval.
 export const WAITLIST_ERROR = 'That didn’t go through. Please try again in a moment.';
 // NOT in landing-page.md: drafted for the no-JS failure page (/waitlist/error/), pending Kyle's approval.

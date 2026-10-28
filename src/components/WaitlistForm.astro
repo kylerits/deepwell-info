@@ -1,4 +1,6 @@
 ---
+import { APP_URL } from '../config/site';
+import { WAITLIST_PRIVACY } from '../lib/waitlist/copy';
 interface Props { id: 'hero' | 'final' | 'retry'; label: string; note?: string }
 const { id, label, note } = Astro.props;
 ---
@@ -12,6 +14,7 @@ const { id, label, note } = Astro.props;
     <button class="btn" type="submit">{label}</button>
   </form>
   {note && <p class="micro" data-waitlist-note>{note}</p>}
+  <p class="micro" data-waitlist-privacy>{WAITLIST_PRIVACY} <a href={`${APP_URL}/privacy`}>Privacy</a></p>
   <p class="noted" role="status" tabindex="-1" data-waitlist-status></p>
 </div>
 <script>
