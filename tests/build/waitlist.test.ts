@@ -16,6 +16,14 @@ test('pilot: hero and final forms post to the Worker without JS, with labelled e
   expect(d.body.textContent).toContain('We’ll email you once. When it’s ready.');
 });
 
+test('pilot: every waitlist form carries the privacy line and links /privacy (KYL-80)', () => {
+  for (const f of d.querySelectorAll('form[data-waitlist]')) {
+    const p = f.closest('[data-waitlist-root]')!.querySelector('[data-waitlist-privacy]')!;
+    expect(p.textContent).toContain('We keep only your email, to send your invite, then delete it.');
+    expect(p.querySelector('a')!.getAttribute('href')).toBe('https://app.readdeepwell.com/privacy');
+  }
+});
+
 test('built CSS hides [hidden] elements despite author display rules', () => {
   const css = readdirSync('dist-pilot/_astro').filter((n) => n.endsWith('.css')).map((n) => readFileSync(`dist-pilot/_astro/${n}`, 'utf8')).join('\n')
     + [...readFileSync('dist-pilot/index.html', 'utf8').matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map((m) => m[1]).join('\n');

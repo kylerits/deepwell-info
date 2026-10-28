@@ -6,6 +6,7 @@ const links = [
   { label: 'Read', href: APP_URL }, { label: 'Pricing', href: '#pricing' },
   ABOUT_URL && { label: 'About', href: ABOUT_URL }, PRESS_URL && { label: 'Press', href: PRESS_URL },
   INSTAGRAM_URL && { label: 'Instagram', href: INSTAGRAM_URL }, { label: 'Contact', href: `mailto:${CONTACT_EMAIL}` },
+  { label: 'Privacy', href: `${APP_URL}/privacy` },
 ].filter(Boolean) as { label: string; href: string }[];
 ---
 <footer class="foot-sec" data-depth="1" data-scene="footer">
